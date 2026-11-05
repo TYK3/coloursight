@@ -11,10 +11,15 @@
   color: var(--colour-text);
   cursor: pointer;
 }
-.cs-live__start {
+.cs-live .cs-live__start {
   background: var(--colour-accent);
   border-color: var(--colour-accent);
   color: var(--colour-accent-text);
+}
+.cs-live .cs-live__start.is-running {
+  background: var(--colour-text);
+  border-color: var(--colour-text);
+  color: var(--colour-surface);
 }
 .cs-live button:disabled { opacity: 0.6; cursor: not-allowed; }
 .cs-live__toggle { display: inline-flex; }
