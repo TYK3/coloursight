@@ -6,10 +6,24 @@
  */
 
 import { getProfile, subscribe } from '../profile/profile.js';
-import { correctImageData } from '../correct/correct.js';
+import { correctImageData, simulateImageData } from '../correct/correct.js';
 
 const SAMPLE_W = 320;
 const SAMPLE_H = 240;
+
+/** Plain-words label for each simulatable colour-vision type. */
+const SIM_TYPE_WORDS = { protan: 'protan', deutan: 'deutan', tritan: 'tritan' };
+
+/**
+ * Blue/green pair that reads as clearly different normally but collapses
+ * under the tritan simulation (see correct.test.mjs), so the tritan preview
+ * has something to show.
+ * @type {[string, number, number, number][]}
+ */
+export const TRITAN_DEMO_DOTS = [
+  ['#1976d2', 296, 120, 14],
+  ['#2e7d32', 296, 178, 14],
+];
 
 /**
  * Map a ColourProfile to the shape expected by the corrector.
@@ -93,6 +107,14 @@ export function drawSampleScene(ctx) {
     ctx.arc(x, y, 26, 0, Math.PI * 2);
     ctx.fill();
   });
+
+  // Tritan-confusable blue/green pair, off to the side of the main dot grid.
+  TRITAN_DEMO_DOTS.forEach(([c, x, y, r]) => {
+    ctx.fillStyle = c;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  });
 }
 
 /**
@@ -117,6 +139,10 @@ export function mountPreview(root) {
       <span class="cs-preview__profile-label">Active profile:</span>
       <span class="cs-preview__profile-value" data-el="profile-summary">—</span>
     </div>
+    <p class="cs-preview__sim-note" data-el="sim-note" hidden>Take the test to see how a colour-vision viewer would see this.</p>
+    <button type="button" class="cs-preview__btn cs-preview__sim-toggle" data-el="sim-toggle" aria-pressed="false">
+      Show as a <span data-el="sim-toggle-type">deutan</span> viewer sees it
+    </button>
     <div class="cs-preview__toolbar">
       <button type="button" class="cs-preview__btn" data-el="sample-btn">Load sample scene</button>
       <button type="button" class="cs-preview__btn" data-el="upload-btn">Upload your own photo…</button>
@@ -157,9 +183,15 @@ export function mountPreview(root) {
   const uploadBtn = /** @type {HTMLButtonElement} */ (el('upload-btn'));
   const applyBtn = /** @type {HTMLButtonElement} */ (el('apply-btn'));
   const fileInput = /** @type {HTMLInputElement} */ (el('file-input'));
+  const simToggle = /** @type {HTMLButtonElement} */ (el('sim-toggle'));
+  const simToggleTypeEl = el('sim-toggle-type');
+  const simNoteEl = el('sim-note');
 
   /** @type {string|null} */
   let objectUrl = null;
+  /** True original pixels, independent of whatever the canvases currently display. */
+  let sourceImageData = null;
+  let simOn = false;
 
   function setStatus(message) {
     statusEl.textContent = message || '';
@@ -196,18 +228,45 @@ export function mountPreview(root) {
     afterCanvas.height = h;
   }
 
+  /** Update the sim toggle's availability and label for the active profile type. */
+  function updateSimToggle(simType) {
+    const canSimulate = Boolean(SIM_TYPE_WORDS[simType]);
+    simToggle.disabled = !canSimulate;
+    simNoteEl.hidden = canSimulate;
+    if (canSimulate) {
+      simToggleTypeEl.textContent = SIM_TYPE_WORDS[simType];
+    }
+    if (!canSimulate && simOn) {
+      simOn = false;
+      simToggle.setAttribute('aria-pressed', 'false');
+    }
+  }
+
   function applyCorrection(lead) {
     const profile = getProfile();
     summaryEl.textContent = formatProfile(profile);
     const mapped = profileToCorrector(profile);
-    const src = beforeCtx.getImageData(0, 0, beforeCanvas.width, beforeCanvas.height);
-    const out = correctImageData(src, mapped);
-    afterCtx.putImageData(out, 0, 0);
+    updateSimToggle(mapped.type);
+    if (!sourceImageData) return;
+
+    const corrected = correctImageData(sourceImageData, mapped);
+    const showSim = simOn && SIM_TYPE_WORDS[mapped.type];
+    const beforeOut = showSim ? simulateImageData(sourceImageData, mapped.type) : sourceImageData;
+    const afterOut = showSim ? simulateImageData(corrected, mapped.type) : corrected;
+    beforeCtx.putImageData(beforeOut, 0, 0);
+    afterCtx.putImageData(afterOut, 0, 0);
+
     const strength = mapped.confidence;
     const applied = mapped.type === 'normal' || strength === 0
       ? 'No remapping applied (normal profile or zero strength).'
       : `Applied ${mapped.type} remapping at strength ${Number(strength).toFixed(2)}.`;
-    setStatus(lead ? `${lead} ${applied}` : applied);
+    const simNote = showSim ? ` Showing as a ${SIM_TYPE_WORDS[mapped.type]} viewer would see both images.` : '';
+    setStatus(lead ? `${lead} ${applied}${simNote}` : `${applied}${simNote}`);
+  }
+
+  /** Capture the canvas's current pixels as the true "before" source, before any simulation overlay. */
+  function captureSource() {
+    sourceImageData = beforeCtx.getImageData(0, 0, beforeCanvas.width, beforeCanvas.height);
   }
 
   function loadSample() {
@@ -218,6 +277,7 @@ export function mountPreview(root) {
     fileInput.value = '';
     resizeCanvases(SAMPLE_W, SAMPLE_H);
     drawSampleScene(beforeCtx);
+    captureSource();
     applyCorrection('Sample scene loaded.');
   }
 
@@ -239,6 +299,7 @@ export function mountPreview(root) {
       const h = Math.max(1, Math.round(img.height * scale));
       resizeCanvases(w, h);
       beforeCtx.drawImage(img, 0, 0, w, h);
+      captureSource();
       applyCorrection(`Loaded “${file.name}” (${w}×${h}).`);
     };
     img.onerror = () => {
@@ -254,6 +315,12 @@ export function mountPreview(root) {
   sampleBtn.addEventListener('click', loadSample);
   uploadBtn.addEventListener('click', () => fileInput.click());
   applyBtn.addEventListener('click', () => {
+    applyCorrection();
+  });
+  simToggle.addEventListener('click', () => {
+    if (simToggle.disabled) return;
+    simOn = !simOn;
+    simToggle.setAttribute('aria-pressed', String(simOn));
     applyCorrection();
   });
   fileInput.addEventListener('change', () => {

@@ -31,6 +31,30 @@
   margin-right: 0.35rem;
 }
 
+.cs-preview__sim-note {
+  margin: 0 0 0.75rem;
+  color: #4a4a4a;
+  font-size: 0.95rem;
+}
+
+.cs-preview__sim-toggle {
+  margin-bottom: 0.75rem;
+}
+
+.cs-preview__sim-toggle[aria-pressed="true"],
+.cs-preview__btn.cs-preview__sim-toggle[aria-pressed="true"]:hover,
+.cs-preview__btn.cs-preview__sim-toggle[aria-pressed="true"]:focus-visible {
+  background: #0057a8;
+  border-color: #0057a8;
+  color: #fff;
+  text-decoration: underline;
+}
+
+.cs-preview__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .cs-preview__toolbar {
   display: flex;
   flex-wrap: wrap;

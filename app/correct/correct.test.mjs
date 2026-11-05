@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { correctImageData, correctRgb } from './correct.js';
+import { correctImageData, correctRgb, simulateImageData, simulateRgb } from './correct.js';
 
 function fixture() {
   // red, green, blue, yellow, grey, orange
@@ -46,4 +46,34 @@ test('seam C: missing/invalid profile treated as normal', () => {
   for (const p of [undefined, null, {}, { type: 'xyz' }]) {
     assert.equal(diff(correctImageData(img, p).data, img.data), 0);
   }
+});
+
+test('simulateRgb: unknown/normal type leaves the colour unchanged', () => {
+  for (const type of [undefined, null, 'normal', 'xyz']) {
+    assert.deepEqual(simulateRgb(40, 180, 60, type), [40, 180, 60]);
+  }
+});
+
+for (const type of ['protan', 'deutan', 'tritan']) {
+  test(`simulateRgb: ${type} changes a colourful pixel`, () => {
+    assert.notDeepEqual(simulateRgb(40, 180, 60, type), [40, 180, 60]);
+  });
+}
+
+test('simulateImageData: changes some pixels, keeps alpha, size and does not mutate input', () => {
+  const img = fixture();
+  const before = [...img.data];
+  const out = simulateImageData(img, 'tritan');
+  assert.ok(diff(out.data, img.data) > 0);
+  assert.deepEqual([...img.data], before, 'input not mutated');
+  assert.equal(out.width, img.width);
+  assert.equal(out.height, img.height);
+  for (let i = 3; i < out.data.length; i += 4) assert.equal(out.data[i], 200);
+});
+
+test('simulateImageData: unknown type returns an unchanged copy', () => {
+  const img = fixture();
+  const out = simulateImageData(img, 'xyz');
+  assert.deepEqual([...out.data], [...img.data]);
+  assert.notEqual(out.data, img.data);
 });

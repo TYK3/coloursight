@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="preview/preview.css">
   <!-- T8 shell mount: settings styles -->
   <link rel="stylesheet" href="settings/settings.css">
+  <!-- Home "original vs corrected" strip styles -->
+  <link rel="stylesheet" href="home/home.css">
   <!-- T10 polish: loaded last so it can override -->
   <link rel="stylesheet" href="polish/polish.css">
   <script type="module" src="lib/router.js"></script>
@@ -20,6 +22,8 @@
   <script type="module" src="preview/preview.js"></script>
   <!-- T8 shell mount: settings module (self-mounts into #settings-root) -->
   <script type="module" src="settings/settings.js"></script>
+  <!-- Home "original vs corrected" strip: reuses the preview sample scene + correction module -->
+  <script type="module" src="home/home.js"></script>
   <!-- T10 polish: focus management, titles, empty states (runs last) -->
   <script type="module" src="polish/polish.js"></script>
 </head>
@@ -41,13 +45,26 @@
     <section id="view-home" data-view="home" aria-labelledby="h-home">
       <h1 id="h-home">ColourSight</h1>
       <p class="lead">Find out how you see colour, then see the world with colours remapped for you. Everything runs in your browser; nothing is uploaded.</p>
+      <div class="cs-home-strip" data-el="home-strip">
+        <p class="cs-home-strip__caption" data-el="home-strip-caption">Example profile: deutan, moderate — original vs corrected.</p>
+        <div class="cs-home-strip__pair">
+          <figure class="cs-home-strip__figure">
+            <canvas data-el="home-strip-before" width="320" height="240" aria-label="Original sample scene, before colour correction"></canvas>
+            <figcaption>Original</figcaption>
+          </figure>
+          <figure class="cs-home-strip__figure">
+            <canvas data-el="home-strip-after" width="320" height="240" aria-label="Same sample scene with colours corrected for the profile above"></canvas>
+            <figcaption>Corrected</figcaption>
+          </figure>
+        </div>
+      </div>
       <ol class="cs-home-steps">
         <li><strong>Take the short test</strong> – a few quick steps with coloured swatches and dotted plates.</li>
         <li><strong>Fine-tune your profile</strong> – adjust the type and correction intensity in Settings.</li>
         <li><strong>See the difference</strong> – compare a photo before and after correction, or open the <a href="live/">live camera</a>.</li>
       </ol>
       <p class="cs-home-actions">
-        <a class="button" href="#test">Start the colour test</a>
+        <a class="button" href="#test">Take the 2-minute test</a>
         <a class="button button--secondary" href="#preview">Try the correction preview</a>
       </p>
       <p class="cs-home-note">ColourSight is a screening and assistive tool, not a medical diagnosis.</p>
