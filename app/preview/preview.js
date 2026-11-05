@@ -35,6 +35,21 @@ export function profileToCorrector(profile) {
 }
 
 /**
+ * Call `refresh` whenever the Preview route is shown, so the view never keeps
+ * a profile that went stale while it was hidden (e.g. after finishing the test).
+ * @param {{ location: { hash: string }, addEventListener: Function, removeEventListener: Function }} win
+ * @param {() => void} refresh
+ * @returns {() => void} unbind
+ */
+export function refreshOnPreviewRoute(win, refresh) {
+  const onRoute = () => {
+    if (win.location.hash === '#preview') refresh();
+  };
+  win.addEventListener('hashchange', onRoute);
+  return () => win.removeEventListener('hashchange', onRoute);
+}
+
+/**
  * Draw a colourful sample scene onto a 2d canvas context (fixed SAMPLE_W x SAMPLE_H).
  * @param {CanvasRenderingContext2D} ctx
  */
@@ -244,6 +259,10 @@ export function mountPreview(root) {
   loadSample();
 
   return {
+    /** Re-read the active profile and redraw the After image. */
+    refresh() {
+      applyCorrection();
+    },
     destroy() {
       unsubscribe();
       if (objectUrl) {
@@ -262,5 +281,6 @@ const autoRoot =
     ? document.getElementById('preview-root') || document.getElementById('cs-preview-root')
     : null;
 if (autoRoot) {
-  mountPreview(autoRoot);
+  const view = mountPreview(autoRoot);
+  refreshOnPreviewRoute(window, () => view.refresh());
 }

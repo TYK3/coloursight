@@ -5,11 +5,11 @@
 
 import { ITEMS, scoreableItems } from './items.js';
 import { scoreAnswers, summariseResult } from './scoring.js';
-import { saveResult, loadResult, RESULT_STORAGE_KEY } from './result.js';
+import { commitResult, loadResult, RESULT_STORAGE_KEY } from './result.js';
 
 export { scoreAnswers, summariseResult } from './scoring.js';
 export { ITEMS, scoreableItems } from './items.js';
-export { saveResult, loadResult, RESULT_STORAGE_KEY } from './result.js';
+export { saveResult, commitResult, loadResult, RESULT_STORAGE_KEY } from './result.js';
 
 /** @typedef {import('./scoring.js').ColourVisionResult} ColourVisionResult */
 
@@ -261,7 +261,7 @@ export class ColourVisionTest {
       choice: this.choices[it.id] ?? null,
     }));
     this.result = scoreAnswers(raw, scoreableItems());
-    saveResult(this.result);
+    commitResult(this.result);
     this.phase = 'result';
     this.render({ focusHeading: true });
   }
@@ -309,6 +309,7 @@ function escapeAttr(s) {
 }
 
 function boot() {
+  if (typeof document === 'undefined') return; // imported by node --test
   const root = mountRoot();
   if (!root) return;
   // Clear the stub copy inside #view-test except our root / keep heading structure tidy

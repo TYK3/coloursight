@@ -3,6 +3,8 @@
  * @module
  */
 
+import { profileFromResult, setProfile } from '../profile/profile.js';
+
 /**
  * @typedef {import('./scoring.js').ColourVisionResult} ColourVisionResult
  */
@@ -15,6 +17,17 @@ export const RESULT_STORAGE_KEY = 'coloursight.result';
  */
 export function saveResult(result) {
   localStorage.setItem(RESULT_STORAGE_KEY, JSON.stringify(result));
+}
+
+/**
+ * Finish the test: store the result and make the derived profile active
+ * through the profile module, so Preview, Settings and the camera refresh.
+ * @param {ColourVisionResult} result
+ * @returns {import('../profile/profile.js').ColourProfile}
+ */
+export function commitResult(result) {
+  saveResult(result);
+  return setProfile(profileFromResult(result));
 }
 
 /**
