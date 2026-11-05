@@ -6,6 +6,7 @@
 import { ITEMS, scoreableItems } from './items.js';
 import { scoreAnswers, summariseResult } from './scoring.js';
 import { commitResult, loadResult, RESULT_STORAGE_KEY } from './result.js';
+import { plateSvg } from './plate.js';
 
 export { scoreAnswers, summariseResult } from './scoring.js';
 export { ITEMS, scoreableItems } from './items.js';
@@ -31,72 +32,15 @@ function mountRoot() {
 }
 
 /**
- * Build a simple SVG digit plate from coloured dots (original artwork, not Ishihara).
- * @param {{ digit: string, figure: string, ground: string }} item
+ * Stable per-item seed so a plate looks the same across re-renders within a
+ * session but differs between sessions.
+ * @param {number} sessionSeed
+ * @param {string} id
  */
-function plateSvg(item) {
-  const size = 220;
-  const cx = size / 2;
-  const cy = size / 2;
-  const dots = [];
-  // Ground dots in a disk
-  for (let i = 0; i < 90; i += 1) {
-    const a = (i * 137.5 * Math.PI) / 180;
-    const r = 18 + (i % 7) * 10;
-    if (r > 95) continue;
-    const x = cx + Math.cos(a) * r;
-    const y = cy + Math.sin(a) * r;
-    const rad = 5 + (i % 3);
-    dots.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rad}" fill="${item.ground}"/>`);
-  }
-  // Figure dots roughly forming the digit via a hidden text mask approach:
-  // sample points inside a path approximated by placing dots on digit strokes.
-  const figurePoints = digitPoints(item.digit, cx, cy);
-  figurePoints.forEach((p, i) => {
-    const rad = 6 + (i % 3);
-    dots.push(`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${rad}" fill="${item.figure}"/>`);
-  });
-
-  return `<svg class="cs-test__plate" viewBox="0 0 ${size} ${size}" role="img" aria-label="Colour plate — try to read the digit">
-    <circle cx="${cx}" cy="${cy}" r="108" fill="#222"/>
-    ${dots.join('\n    ')}
-  </svg>`;
-}
-
-/**
- * Approximate stroke samples for digits 2,5,6 (enough for this bank).
- * @param {string} digit
- * @param {number} cx
- * @param {number} cy
- */
-function digitPoints(digit, cx, cy) {
-  /** @type {{x:number,y:number}[]} */
-  const pts = [];
-  const add = (x, y) => pts.push({ x: cx + x, y: cy + y });
-
-  if (digit === '5') {
-    for (let x = -30; x <= 30; x += 8) add(x, -40);
-    for (let y = -40; y <= -5; y += 8) add(-30, y);
-    for (let x = -30; x <= 25; x += 8) add(x, -5);
-    for (let y = -5; y <= 40; y += 8) add(25, y);
-    for (let x = 25; x >= -30; x -= 8) add(x, 40);
-  } else if (digit === '2') {
-    for (let x = -28; x <= 28; x += 8) add(x, -40);
-    for (let y = -40; y <= -5; y += 8) add(28, y);
-    for (let x = 28; x >= -28; x -= 8) add(x, -5);
-    for (let y = -5; y <= 40; y += 8) add(-28, y);
-    for (let x = -28; x <= 28; x += 8) add(x, 40);
-  } else if (digit === '6') {
-    for (let a = 0; a < Math.PI * 2; a += 0.35) {
-      add(Math.cos(a) * 28, 10 + Math.sin(a) * 28);
-    }
-    for (let y = -40; y <= 10; y += 8) add(-28, y);
-    for (let x = -28; x <= 20; x += 8) add(x, -40);
-  } else {
-    // Fallback: vertical bar
-    for (let y = -40; y <= 40; y += 8) add(0, y);
-  }
-  return pts;
+function plateSeed(sessionSeed, id) {
+  let h = sessionSeed >>> 0;
+  for (const ch of id) h = Math.imul(h ^ ch.charCodeAt(0), 2654435761) >>> 0;
+  return h;
 }
 
 export class ColourVisionTest {
@@ -112,6 +56,7 @@ export class ColourVisionTest {
     this.choices = Object.create(null);
     /** @type {ColourVisionResult|null} */
     this.result = loadResult();
+    this.plateSessionSeed = Math.floor(Math.random() * 2 ** 32);
     this.root.classList.add('cs-test');
     this.render();
   }
@@ -193,7 +138,7 @@ export class ColourVisionTest {
           .join('')}
       </ul>`;
     } else {
-      stimulus = `<div class="cs-test__plate-wrap">${plateSvg(item)}</div>`;
+      stimulus = `<div class="cs-test__plate-wrap">${plateSvg(item, plateSeed(this.plateSessionSeed, item.id))}</div>`;
       choices = `<ul class="cs-test__choices" role="list">
         ${item.options
           .map(
