@@ -30,7 +30,7 @@ test('no "Coming soon" stubs remain; settings and camera are reachable', () => {
   assert.match(html, /<div id="settings-root"><\/div>/);
   assert.match(html, /href="settings\/settings\.css"/);
   assert.match(html, /src="settings\/settings\.js"/);
-  assert.match(html, /href="camera\/"/);
+  assert.match(html, /href="live\/"/);
 });
 
 test('polish stylesheet and script load last', () => {

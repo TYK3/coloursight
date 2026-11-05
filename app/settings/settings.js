@@ -250,12 +250,17 @@ export function mountSettings(el) {
     el.querySelectorAll('input[name="cs-settings-type"]').forEach((input) => {
       input.addEventListener('change', () => {
         if (!(input instanceof HTMLInputElement) || !input.checked) return;
-        draftType = /** @type {ColourVisionType} */ (input.value);
+        const value = input.value;
+        draftType = /** @type {ColourVisionType} */ (value);
         if (draftType === 'normal') draftPercent = 0;
         // Re-render so intensity disabled state and readout stay in sync
         const statusBefore = el.querySelector('[data-role="status"]')?.textContent ?? '';
         render();
         if (statusBefore) announce(statusBefore);
+        const again = el.querySelector(
+          `input[name="cs-settings-type"][value="${CSS.escape(value)}"]`,
+        );
+        if (again instanceof HTMLElement) again.focus();
       });
     });
 

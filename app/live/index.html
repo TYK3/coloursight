@@ -4,14 +4,28 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Live camera correction · ColourSight</title>
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <link rel="stylesheet" href="../styles/layout.css">
   <link rel="stylesheet" href="live.css">
 </head>
 <body>
-  <main>
-    <p class="cs-live-back"><a href="../">← Back to ColourSight</a></p>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="../#home">ColourSight</a>
+    <nav aria-label="Main">
+      <ul class="nav-list">
+        <li><a href="../#test">Test</a></li>
+        <li><a href="./" aria-current="page">Camera</a></li>
+        <li><a href="../#preview">Preview</a></li>
+        <li><a href="../#settings">Settings</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main id="main" tabindex="-1">
     <h1>Live camera correction</h1>
     <div id="live-root"></div>
   </main>
+  <footer class="site-footer"><p>No data leaves your device.</p></footer>
   <script type="module" src="live.js"></script>
 </body>
 </html>

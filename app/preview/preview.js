@@ -119,12 +119,10 @@ export function mountPreview(root) {
     </div>
     <div class="cs-preview__toolbar">
       <button type="button" class="cs-preview__btn" data-el="sample-btn">Load sample scene</button>
-      <label class="cs-preview__file">
-        <span>Upload image</span>
-        <input type="file" accept="image/*" data-el="file-input" />
-      </label>
-      <button type="button" class="cs-preview__btn cs-preview__btn--primary" data-el="apply-btn">Apply correction</button>
+      <button type="button" class="cs-preview__btn" data-el="upload-btn">Upload your own photo…</button>
+      <button type="button" class="cs-preview__btn" data-el="apply-btn">Re-apply</button>
     </div>
+    <input type="file" accept="image/*" data-el="file-input" class="cs-preview__file-input" tabindex="-1" aria-hidden="true" />
     <p class="cs-preview__status" data-el="status" aria-live="polite"></p>
     <div class="cs-preview__pair">
       <figure class="cs-preview__figure">
@@ -156,6 +154,7 @@ export function mountPreview(root) {
   const summaryEl = el('profile-summary');
   const statusEl = el('status');
   const sampleBtn = /** @type {HTMLButtonElement} */ (el('sample-btn'));
+  const uploadBtn = /** @type {HTMLButtonElement} */ (el('upload-btn'));
   const applyBtn = /** @type {HTMLButtonElement} */ (el('apply-btn'));
   const fileInput = /** @type {HTMLInputElement} */ (el('file-input'));
 
@@ -166,15 +165,28 @@ export function mountPreview(root) {
     statusEl.textContent = message || '';
   }
 
+  const TYPE_WORDS = {
+    protan: 'Protan',
+    deutan: 'Deutan',
+    tritan: 'Tritan',
+    normal: 'Normal',
+  };
+
   function formatProfile(profile) {
-    if (!profile) return 'none (default)';
-    const parts = [
-      profile.type || 'unknown',
-      profile.severityLabel || '',
-      typeof profile.severity === 'number' ? `severity ${profile.severity.toFixed(2)}` : '',
-      profile.source ? `via ${profile.source}` : '',
-    ].filter(Boolean);
-    return parts.join(' · ');
+    if (!profile || profile.source === 'default' || !profile.type) {
+      return 'No colour profile yet';
+    }
+    const type = TYPE_WORDS[profile.type] || profile.type;
+    const from = profile.source === 'test'
+      ? 'from your test'
+      : profile.source === 'manual'
+        ? 'from your settings'
+        : 'saved on this device';
+    if (profile.type === 'normal') return `${type}, ${from}`;
+    const strength = profile.severityLabel && profile.severityLabel !== 'none'
+      ? profile.severityLabel
+      : 'mild';
+    return `${type}, ${strength}, ${from}`;
   }
 
   function resizeCanvases(w, h) {
@@ -184,7 +196,7 @@ export function mountPreview(root) {
     afterCanvas.height = h;
   }
 
-  function applyCorrection() {
+  function applyCorrection(lead) {
     const profile = getProfile();
     summaryEl.textContent = formatProfile(profile);
     const mapped = profileToCorrector(profile);
@@ -192,11 +204,10 @@ export function mountPreview(root) {
     const out = correctImageData(src, mapped);
     afterCtx.putImageData(out, 0, 0);
     const strength = mapped.confidence;
-    setStatus(
-      mapped.type === 'normal' || strength === 0
-        ? 'No remapping applied (normal profile or zero strength).'
-        : `Applied ${mapped.type} remapping at strength ${Number(strength).toFixed(2)}.`,
-    );
+    const applied = mapped.type === 'normal' || strength === 0
+      ? 'No remapping applied (normal profile or zero strength).'
+      : `Applied ${mapped.type} remapping at strength ${Number(strength).toFixed(2)}.`;
+    setStatus(lead ? `${lead} ${applied}` : applied);
   }
 
   function loadSample() {
@@ -207,8 +218,7 @@ export function mountPreview(root) {
     fileInput.value = '';
     resizeCanvases(SAMPLE_W, SAMPLE_H);
     drawSampleScene(beforeCtx);
-    applyCorrection();
-    setStatus('Sample scene loaded.');
+    applyCorrection('Sample scene loaded.');
   }
 
   /**
@@ -229,8 +239,7 @@ export function mountPreview(root) {
       const h = Math.max(1, Math.round(img.height * scale));
       resizeCanvases(w, h);
       beforeCtx.drawImage(img, 0, 0, w, h);
-      applyCorrection();
-      setStatus(`Loaded “${file.name}” (${w}×${h}).`);
+      applyCorrection(`Loaded “${file.name}” (${w}×${h}).`);
     };
     img.onerror = () => {
       setStatus('Could not load that image. Try another file.');
@@ -243,6 +252,7 @@ export function mountPreview(root) {
   }
 
   sampleBtn.addEventListener('click', loadSample);
+  uploadBtn.addEventListener('click', () => fileInput.click());
   applyBtn.addEventListener('click', () => {
     applyCorrection();
   });
@@ -251,8 +261,7 @@ export function mountPreview(root) {
     if (file) loadFile(file);
   });
 
-  const unsubscribe = subscribe((profile) => {
-    summaryEl.textContent = formatProfile(profile);
+  const unsubscribe = subscribe(() => {
     applyCorrection();
   });
 
