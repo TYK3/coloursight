@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Camera capture · ColourSight</title>
+  <link rel="stylesheet" href="camera.css">
+</head>
+<body>
+  <main class="cb-camera">
+    <p class="cb-camera__back"><a href="../">← Back to ColourSight</a></p>
+    <h1>Camera capture</h1>
+    <p>Start the webcam to draw a live feed onto the canvas. No correction is applied yet.</p>
+    <div class="cb-camera__toolbar">
+      <button type="button" class="cb-camera__btn" id="start-btn">Start camera</button>
+      <button type="button" class="cb-camera__btn cb-camera__btn--stop" id="stop-btn" disabled>Stop</button>
+    </div>
+    <p class="cb-camera__status" id="status" aria-live="polite">Camera idle.</p>
+    <p class="cb-camera__error" id="error" role="alert" hidden></p>
+    <div class="cb-camera__stage">
+      <video class="cb-camera__video" id="video" muted playsinline></video>
+      <canvas class="cb-camera__canvas" id="canvas" width="640" height="360" aria-label="Live camera preview"></canvas>
+    </div>
+  </main>
+  <script type="module">
+    import { createCamera, describeCameraError } from './camera.js';
+
+    const startBtn = document.getElementById('start-btn');
+    const stopBtn = document.getElementById('stop-btn');
+    const statusEl = document.getElementById('status');
+    const errorEl = document.getElementById('error');
+    const canvas = document.getElementById('canvas');
+    const video = document.getElementById('video');
+
+    function setError(message) {
+      if (!message) {
+        errorEl.hidden = true;
+        errorEl.textContent = '';
+        return;
+      }
+      errorEl.hidden = false;
+      errorEl.textContent = message;
+    }
+
+    const camera = createCamera({
+      canvas,
+      video,
+      onState(state) {
+        const labels = {
+          idle: 'Camera idle.',
+          starting: 'Requesting camera permission…',
+          running: 'Camera running — live frames on canvas.',
+          stopping: 'Stopping camera…',
+        };
+        statusEl.textContent = labels[state] ?? state;
+        startBtn.disabled = state === 'starting' || state === 'running';
+        stopBtn.disabled = state === 'idle' || state === 'stopping';
+      },
+      onError(message) {
+        setError(message);
+      },
+    });
+
+    startBtn.addEventListener('click', async () => {
+      setError('');
+      try {
+        await camera.start();
+      } catch (err) {
+        setError(err?.userMessage || describeCameraError(err));
+      }
+    });
+
+    stopBtn.addEventListener('click', () => {
+      camera.stop();
+      setError('');
+    });
+
+    window.addEventListener('pagehide', () => camera.stop());
+  </script>
+</body>
+</html>

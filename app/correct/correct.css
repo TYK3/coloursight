@@ -1,0 +1,7 @@
+body { font-family: system-ui, sans-serif; margin: 1.5rem; background: #fafafa; color: #111; }
+.note { color: #555; }
+#controls { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
+.pair { display: flex; gap: 1rem; flex-wrap: wrap; }
+figure { margin: 0; }
+canvas { border: 1px solid #ccc; max-width: 100%; display: block; }
+figcaption { text-align: center; margin-top: .25rem; }

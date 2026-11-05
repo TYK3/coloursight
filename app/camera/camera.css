@@ -1,0 +1,78 @@
+.cb-camera {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 48rem;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #1a1a1a;
+}
+
+.cb-camera__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.cb-camera__btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #767676;
+  border-radius: 0.5rem;
+  background: #0057a8;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cb-camera__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cb-camera__btn--stop {
+  background: #4a4a4a;
+}
+
+.cb-camera__status {
+  margin: 0;
+  color: #4a4a4a;
+}
+
+.cb-camera__error {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: #fff4e5;
+  border: 1px solid #b35900;
+  color: #1a1a1a;
+}
+
+.cb-camera__error[hidden] {
+  display: none;
+}
+
+.cb-camera__stage {
+  position: relative;
+  background: #111;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  min-height: 12rem;
+}
+
+.cb-camera__canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+
+.cb-camera__video {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cb-camera__back { margin: 0; }
+.cb-camera__back a { color: #0057a8; }

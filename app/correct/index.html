@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ColourSight – correction demo</title>
+<link rel="stylesheet" href="correct.css">
+</head>
+<body>
+<h1>Colour correction demo</h1>
+<p class="note">Assistive colour remapping, not a medical treatment.</p>
+<form id="controls">
+  <label>Profile
+    <select id="type">
+      <option value="protan">Protan</option>
+      <option value="deutan" selected>Deutan</option>
+      <option value="tritan">Tritan</option>
+      <option value="normal">Normal</option>
+    </select>
+  </label>
+  <label>Confidence <input id="confidence" type="range" min="0" max="1" step="0.05" value="1"></label>
+  <button type="submit">Apply</button>
+</form>
+<div class="pair">
+  <figure><canvas id="before" width="320" height="240"></canvas><figcaption>Before</figcaption></figure>
+  <figure><canvas id="after" width="320" height="240"></canvas><figcaption>After</figcaption></figure>
+</div>
+<script type="module">
+import { correctImageData } from './correct.js';
+const before = document.getElementById('before').getContext('2d');
+const after = document.getElementById('after').getContext('2d');
+
+function drawSample(ctx) {
+  const g = ctx.createLinearGradient(0, 0, 320, 0);
+  ['#e53935','#fb8c00','#fdd835','#43a047','#1e88e5','#8e24aa'].forEach((c, i, a) => g.addColorStop(i / (a.length - 1), c));
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 320, 60);
+  ctx.fillStyle = '#222'; ctx.fillRect(20, 80, 60, 150);
+  ['#d32f2f','#ffb300','#2e7d32'].forEach((c, i) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(50, 105 + i * 50, 20, 0, 7); ctx.fill(); });
+  [['#c62828',130,110],['#7cb342',190,110],['#ef6c00',250,110],['#558b2f',130,180],['#ad1457',190,180],['#f9a825',250,180]]
+    .forEach(([c, x, y]) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, y, 26, 0, 7); ctx.fill(); });
+}
+
+drawSample(before);
+function apply(e) {
+  e && e.preventDefault();
+  const profile = { type: document.getElementById('type').value, confidence: +document.getElementById('confidence').value };
+  after.putImageData(correctImageData(before.getImageData(0, 0, 320, 240), profile), 0, 0);
+}
+document.getElementById('controls').addEventListener('submit', apply);
+apply();
+</script>
+</body>
+</html>

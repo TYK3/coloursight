@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ColourSight</title>
+  <meta name="description" content="ColourSight: a personalised colour-vision test and live camera colour correction, all in your browser.">
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="test/test.css">
+  <!-- T7 nav mount: preview styles (allowed shell wire-up) -->
+  <link rel="stylesheet" href="preview/preview.css">
+  <!-- T8 shell mount: settings styles -->
+  <link rel="stylesheet" href="settings/settings.css">
+  <!-- T10 polish: loaded last so it can override -->
+  <link rel="stylesheet" href="polish/polish.css">
+  <script type="module" src="lib/router.js"></script>
+  <script type="module" src="test/test.js"></script>
+  <!-- T7 nav mount: preview module (allowed shell wire-up) -->
+  <script type="module" src="preview/preview.js"></script>
+  <!-- T8 shell mount: settings module (self-mounts into #settings-root) -->
+  <script type="module" src="settings/settings.js"></script>
+  <!-- T10 polish: focus management, titles, empty states (runs last) -->
+  <script type="module" src="polish/polish.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="#home">ColourSight</a>
+    <nav aria-label="Main">
+      <ul class="nav-list">
+        <li><a href="#test" data-route="test">Test</a></li>
+        <li><a href="live/">Camera</a></li>
+        <!-- T7 nav mount: Preview link (allowed shell wire-up) -->
+        <li><a href="#preview" data-route="preview">Preview</a></li>
+        <li><a href="#settings" data-route="settings">Settings</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main id="main" tabindex="-1">
+    <section id="view-home" data-view="home" aria-labelledby="h-home">
+      <h1 id="h-home">ColourSight</h1>
+      <p class="lead">Find out how you see colour, then see the world with colours remapped for you. Everything runs in your browser; nothing is uploaded.</p>
+      <ol class="cs-home-steps">
+        <li><strong>Take the short test</strong> – a few quick steps with coloured swatches and dotted plates.</li>
+        <li><strong>Fine-tune your profile</strong> – adjust the type and correction intensity in Settings.</li>
+        <li><strong>See the difference</strong> – compare a photo before and after correction, or open the live camera.</li>
+      </ol>
+      <p class="cs-home-actions">
+        <a class="button" href="#test">Start the colour test</a>
+        <a class="button button--secondary" href="#preview">Try the correction preview</a>
+      </p>
+      <p class="cs-home-note">ColourSight is a screening and assistive tool, not a medical diagnosis.</p>
+    </section>
+    <section id="view-test" data-view="test" aria-labelledby="h-test" hidden>
+      <h1 id="h-test">Colour-vision test</h1>
+      <div id="colour-test-root"></div>
+    </section>
+    <section id="view-camera" data-view="camera" aria-labelledby="h-camera" hidden>
+      <h1 id="h-camera">Live camera</h1>
+      <p>The live camera opens on its own page. Your browser will ask for permission before the camera starts, and video never leaves your device.</p>
+      <p><a class="button" href="live/">Open the live camera</a></p>
+    </section>
+    <!-- T7 nav mount: Preview view (allowed shell wire-up for #preview) -->
+    <section id="view-preview" data-view="preview" aria-labelledby="h-preview" hidden>
+      <h1 id="h-preview">Correction preview</h1>
+      <div id="preview-root"></div>
+    </section>
+    <section id="view-settings" data-view="settings" aria-labelledby="h-settings" hidden>
+      <h1 id="h-settings">Settings</h1>
+      <div id="settings-root"></div>
+    </section>
+  </main>
+  <footer class="site-footer"><p>No data leaves your device.</p></footer>
+</body>
+</html>

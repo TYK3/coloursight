@@ -1,0 +1,117 @@
+/* Scoped under .cs-preview — static correction preview. */
+
+.cs-preview {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #1a1a1a;
+  max-width: 48rem;
+}
+
+.cs-preview__lead {
+  margin: 0 0 0.5rem;
+  line-height: 1.5;
+}
+
+.cs-preview__disclaimer {
+  margin: 0 0 1rem;
+  padding: 0.5rem 0.75rem;
+  background: #fff8e6;
+  border-left: 3px solid #b35900;
+  color: #4a4a4a;
+  font-size: 0.95rem;
+}
+
+.cs-preview__profile {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+}
+
+.cs-preview__profile-label {
+  font-weight: 600;
+  margin-right: 0.35rem;
+}
+
+.cs-preview__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.cs-preview__btn {
+  font: inherit;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid #767676;
+  border-radius: 0.5rem;
+  background: #fff;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+.cs-preview__btn:hover {
+  background: #f0f0f0;
+}
+
+.cs-preview__btn:focus-visible {
+  outline: 2px solid #b35900;
+  outline-offset: 2px;
+}
+
+.cs-preview__btn--primary {
+  background: #0057a8;
+  border-color: #0057a8;
+  color: #fff;
+}
+
+.cs-preview__btn--primary:hover {
+  background: #004687;
+}
+
+.cs-preview__file {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font: inherit;
+  padding: 0.45rem 0.9rem;
+  border: 1px dashed #767676;
+  border-radius: 0.5rem;
+  background: #fafafa;
+  cursor: pointer;
+}
+
+.cs-preview__file input {
+  font: inherit;
+  max-width: 14rem;
+}
+
+.cs-preview__status {
+  min-height: 1.4em;
+  margin: 0 0 1rem;
+  color: #4a4a4a;
+  font-size: 0.95rem;
+}
+
+.cs-preview__pair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.cs-preview__figure {
+  margin: 0;
+}
+
+.cs-preview__figure canvas {
+  display: block;
+  border: 1px solid #767676;
+  border-radius: 0.25rem;
+  max-width: 100%;
+  background: #fff;
+}
+
+.cs-preview__figure figcaption {
+  text-align: center;
+  margin-top: 0.35rem;
+  font-size: 0.9rem;
+  color: #4a4a4a;
+}

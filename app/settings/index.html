@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Settings · ColourSight</title>
+  <meta name="description" content="Adjust your ColourSight colour-vision profile type and correction intensity. Stored only on this device.">
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <link rel="stylesheet" href="settings.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: var(--font-sans);
+      font-size: var(--text-base);
+      line-height: var(--leading);
+      background: var(--colour-bg);
+      color: var(--colour-text);
+      padding: var(--space-5) var(--space-4);
+    }
+    main { max-width: 40rem; margin: 0 auto; }
+    h1 { margin: 0 0 var(--space-3); }
+    .lead { color: var(--colour-muted); margin: 0 0 var(--space-4); }
+    :focus-visible { outline: 3px solid var(--colour-focus); outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Settings</h1>
+    <p class="lead">Set your colour-vision type and correction intensity. Changes are saved in this browser only.</p>
+    <div id="settings-root"></div>
+  </main>
+  <script type="module" src="settings.js"></script>
+</body>
+</html>

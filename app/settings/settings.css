@@ -1,0 +1,165 @@
+/* ColourSight settings — scoped under .cs-settings */
+
+.cs-settings {
+  max-width: 40rem;
+}
+
+.cs-settings__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: 0;
+}
+
+.cs-settings__fieldset {
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius);
+  background: var(--colour-surface);
+}
+
+.cs-settings__fieldset legend {
+  font-weight: 700;
+  padding: 0 var(--space-2);
+}
+
+.cs-settings__hint {
+  margin: 0 0 var(--space-3);
+  color: var(--colour-muted);
+  font-size: 0.95rem;
+}
+
+.cs-settings__radios {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cs-settings__radio {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.cs-settings__radio input {
+  margin-top: 0.35em;
+  accent-color: var(--colour-accent);
+}
+
+.cs-settings__radio label {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cs-settings__field {
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius);
+  background: var(--colour-surface);
+}
+
+.cs-settings__label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+}
+
+.cs-settings__slider-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cs-settings__slider-row input[type="range"] {
+  width: 100%;
+  accent-color: var(--colour-accent);
+}
+
+.cs-settings__slider-row input[type="range"]:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.cs-settings__readout {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--colour-muted);
+}
+
+.cs-settings__meta {
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px dashed var(--colour-border);
+  border-radius: var(--radius);
+  background: var(--colour-bg);
+  color: var(--colour-muted);
+  font-size: 0.95rem;
+}
+
+.cs-settings__meta p {
+  margin: 0 0 var(--space-2);
+}
+
+.cs-settings__meta p:last-child {
+  margin-bottom: 0;
+}
+
+/* Text tag so source is not colour-only */
+.cs-settings__source-tag {
+  display: inline-block;
+  margin-left: var(--space-2);
+  padding: 0.1rem 0.45rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--colour-text);
+  background: var(--colour-surface);
+}
+
+.cs-settings__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.cs-settings__actions button {
+  font: inherit;
+  font-weight: 600;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  border: 2px solid var(--colour-border);
+  background: var(--colour-surface);
+  color: var(--colour-text);
+  cursor: pointer;
+}
+
+.cs-settings__actions button:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.cs-settings__actions button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.cs-settings__primary {
+  background: var(--colour-accent) !important;
+  color: var(--colour-accent-text) !important;
+  border-color: var(--colour-accent) !important;
+}
+
+.cs-settings__danger {
+  border-style: dashed !important;
+}
+
+.cs-settings__status {
+  min-height: 1.5em;
+  margin: var(--space-3) 0 0;
+  color: var(--colour-muted);
+  font-size: 0.95rem;
+}

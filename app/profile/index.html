@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profile demo · ColourSight</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font-family: system-ui, sans-serif;
+      line-height: 1.45;
+    }
+    body { margin: 1.5rem; max-width: 42rem; }
+    pre {
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      background: #f4f4f5;
+      overflow: auto;
+      font-size: 0.875rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      pre { background: #1c1c1e; }
+    }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }
+    button {
+      font: inherit;
+      padding: 0.4rem 0.85rem;
+      border-radius: 0.4rem;
+      border: 1px solid #8884;
+      background: #eee;
+      cursor: pointer;
+    }
+    @media (prefers-color-scheme: dark) {
+      button { background: #2c2c2e; color: inherit; }
+    }
+    .hint { color: #666; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Deficiency profile</h1>
+    <p class="hint">
+      Demo for <code>app/profile/profile.js</code>. Shows the current
+      <code>coloursight.profile</code> (or a profile derived from
+      <code>coloursight.result</code>).
+    </p>
+    <div class="toolbar">
+      <button type="button" id="load-sample">Load sample result</button>
+      <button type="button" id="clear-profile">Clear profile</button>
+      <button type="button" id="refresh">Refresh</button>
+    </div>
+    <h2>Current profile</h2>
+    <pre id="out" aria-live="polite">{}</pre>
+  </main>
+  <script type="module">
+    import {
+      clearProfile,
+      getProfile,
+      profileFromResult,
+      setProfile,
+      subscribe,
+    } from './profile.js';
+
+    const RESULT_KEY = 'coloursight.result';
+    const out = document.getElementById('out');
+
+    const sampleResult = {
+      type: 'deutan',
+      confidence: 0.82,
+      scores: { protan: 0.2, deutan: 0.85, tritan: 0.1 },
+      answers: [],
+      completedAt: new Date().toISOString(),
+      controlCorrect: 2,
+      controlTotal: 2,
+    };
+
+    function render() {
+      out.textContent = JSON.stringify(getProfile(), null, 2);
+    }
+
+    document.getElementById('load-sample').addEventListener('click', () => {
+      localStorage.setItem(RESULT_KEY, JSON.stringify(sampleResult));
+      setProfile(profileFromResult(sampleResult));
+      render();
+    });
+
+    document.getElementById('clear-profile').addEventListener('click', () => {
+      clearProfile();
+      localStorage.removeItem(RESULT_KEY);
+      render();
+    });
+
+    document.getElementById('refresh').addEventListener('click', render);
+
+    subscribe(render);
+    render();
+  </script>
+</body>
+</html>

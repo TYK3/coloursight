@@ -1,0 +1,159 @@
+/* Colour-vision test flow — scoped under .cs-test */
+
+.cs-test {
+  max-width: 40rem;
+}
+
+.cs-test__progress {
+  color: var(--colour-muted);
+  font-size: 0.95rem;
+  margin: 0 0 var(--space-3);
+}
+
+.cs-test__heading {
+  margin: 0 0 var(--space-3);
+  font-size: 1.35rem;
+}
+
+.cs-test__lead {
+  color: var(--colour-muted);
+  margin: 0 0 var(--space-4);
+}
+
+.cs-test__disclaimer {
+  margin: var(--space-4) 0 0;
+  padding: var(--space-3);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius);
+  background: var(--colour-surface);
+  color: var(--colour-muted);
+  font-size: 0.95rem;
+}
+
+.cs-test__swatches {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 32rem) {
+  .cs-test__swatches {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.cs-test__swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: center;
+}
+
+.cs-test__swatch-chip {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+  border: 2px solid var(--colour-border);
+}
+
+.cs-test__swatch[aria-pressed="true"] .cs-test__swatch-chip {
+  outline: 3px solid var(--colour-focus);
+  outline-offset: 3px;
+  border-style: dashed;
+}
+
+.cs-test__swatch-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.cs-test__plate-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 var(--space-4);
+}
+
+.cs-test__plate {
+  width: min(100%, 16rem);
+  height: auto;
+  border-radius: 50%;
+  border: 1px solid var(--colour-border);
+  background: #1a1a1a;
+}
+
+.cs-test__choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  list-style: none;
+}
+
+.cs-test__choice {
+  font: inherit;
+  font-weight: 600;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius);
+  border: 2px solid var(--colour-border);
+  background: var(--colour-surface);
+  color: var(--colour-text);
+  cursor: pointer;
+}
+
+.cs-test__choice[aria-pressed="true"] {
+  border-style: dashed;
+  background: var(--colour-accent);
+  color: var(--colour-accent-text);
+  text-decoration: underline;
+}
+
+.cs-test__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.cs-test__nav button {
+  font: inherit;
+  font-weight: 600;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius);
+  border: 2px solid var(--colour-border);
+  background: var(--colour-surface);
+  color: var(--colour-text);
+  cursor: pointer;
+}
+
+.cs-test__nav button.cs-test__primary {
+  background: var(--colour-accent);
+  color: var(--colour-accent-text);
+  border-color: var(--colour-accent);
+}
+
+.cs-test__nav button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cs-test__result-scores {
+  margin: var(--space-3) 0;
+  padding-left: 1.25rem;
+}
+
+.cs-test__result-scores li {
+  margin-bottom: var(--space-1);
+}
