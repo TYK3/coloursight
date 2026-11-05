@@ -85,6 +85,7 @@ export function mountLive(root) {
       startBtn.textContent = s === 'running' ? 'Stop camera' : s === 'starting' ? 'Starting…' : 'Start camera';
       startBtn.disabled = s === 'starting';
       const running = s === 'running';
+      startBtn.classList.toggle('is-running', running);
       stageEl.classList.toggle('is-running', running);
       idleEl.hidden = running;
     },

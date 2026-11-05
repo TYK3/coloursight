@@ -106,21 +106,6 @@
   margin-bottom: 0;
 }
 
-/* Text tag so source is not colour-only */
-.cs-settings__source-tag {
-  display: inline-block;
-  margin-left: var(--space-2);
-  padding: 0.1rem 0.45rem;
-  border: 1px solid var(--colour-border);
-  border-radius: var(--radius);
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--colour-text);
-  background: var(--colour-surface);
-}
-
 .cs-settings__actions {
   display: flex;
   flex-wrap: wrap;

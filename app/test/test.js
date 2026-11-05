@@ -5,7 +5,7 @@
 
 import { ITEMS, scoreableItems } from './items.js';
 import { scoreAnswers, summariseResult } from './scoring.js';
-import { commitResult, loadResult, RESULT_STORAGE_KEY } from './result.js';
+import { commitResult, loadResult } from './result.js';
 import { plateSvg } from './plate.js';
 
 export { scoreAnswers, summariseResult } from './scoring.js';
@@ -98,7 +98,7 @@ export class ColourVisionTest {
     return `
       <p class="cs-test__progress">Colour-vision screening</p>
       <h2 class="cs-test__heading" id="cs-test-heading">About this test</h2>
-      <p class="cs-test__lead">You will see ${TOTAL_STEPS} short steps. Some ask you to pick the odd swatch out; others ask which digit you can read in a dotted circle. Take your time, and use the best guess if unsure.</p>
+      <p class="cs-test__lead">You will see ${TOTAL_STEPS} short steps. Some ask you to pick the odd swatch out; others ask which digit you can read in a dotted circle. Take your time, and make your best guess if you're unsure.</p>
       ${prior}
       <p class="cs-test__disclaimer"><strong>Screening only.</strong> This is not a clinical diagnosis. Results stay on your device and can guide the camera colour correction later.</p>
       <div class="cs-test__nav">
@@ -132,6 +132,7 @@ export class ColourVisionTest {
               aria-label="${escapeAttr(opt.label)}">
               <span class="cs-test__swatch-chip" style="background:${escapeAttr(opt.colour)}"></span>
               <span class="cs-test__swatch-label">${escapeHtml(opt.label)}</span>
+              <span class="cs-test__swatch-selected" aria-hidden="true"${selected === opt.id ? '' : ' hidden'}>✓ Selected</span>
             </button>
           </li>`,
           )
@@ -164,8 +165,9 @@ export class ColourVisionTest {
       ${choices}
       <div class="cs-test__nav">
         <button type="button" data-action="back" ${isFirst ? 'disabled' : ''}>Back</button>
-        <button type="button" class="cs-test__primary" data-action="next" ${canNext ? '' : 'disabled'}>${nextLabel}</button>
+        <button type="button" class="cs-test__primary" data-action="next" ${canNext ? '' : 'disabled aria-describedby="cs-test-answer-hint"'}>${nextLabel}</button>
       </div>
+      ${canNext ? '' : '<p class="cs-test__hint" id="cs-test-answer-hint">Choose an answer to continue</p>'}
     `;
   }
 

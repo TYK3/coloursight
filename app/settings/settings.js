@@ -215,7 +215,6 @@ export function mountSettings(el) {
           <p>
             <strong>Source:</strong>
             <span data-role="source">${escapeHtml(sourceLabel(current.source))}</span>
-            <span class="cs-settings__source-tag" data-role="source-tag">${escapeHtml(current.source)}</span>
           </p>
           <p>
             <strong>Last updated:</strong>

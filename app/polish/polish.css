@@ -7,8 +7,8 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body { overflow-wrap: break-word; }
 code { overflow-wrap: anywhere; }
 h1 { font-size: clamp(1.6rem, 5vw + 0.5rem, 2.25rem); line-height: 1.2; }
-h1[tabindex="-1"]:focus { outline: none; }
-h1[tabindex="-1"]:focus-visible { outline: 3px solid var(--colour-focus); outline-offset: 4px; }
+h1[tabindex="-1"]:focus,
+h1[tabindex="-1"]:focus-visible { outline: none; box-shadow: none; }
 
 /* Media never forces horizontal scroll and keeps its aspect ratio. */
 img, svg, video, canvas { max-width: 100%; }
@@ -71,7 +71,6 @@ input[type="range"] { min-height: 44px; width: 100%; }
 .cs-settings__radio input { margin: 0; width: 1.25rem; height: 1.25rem; flex: none; }
 .cs-settings__radio label { flex: 1; display: flex; align-items: center; min-height: 44px; }
 .cs-settings__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.cs-settings__source-tag { font-size: 0.875rem; }
 
 /* Test + preview buttons on phones: full-width rows are easier to hit. */
 @media (max-width: 30rem) {
