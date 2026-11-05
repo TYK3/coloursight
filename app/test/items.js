@@ -1,9 +1,14 @@
 /**
  * Colour-vision screening item bank.
- * Colours sit on approximate protan / deutan / tritan confusion lines in sRGB.
- * Stimuli are original odd-one-out swatches and simple SVG "plate" digits —
+ * Each targeted item uses a pair of colours on a real protan, deutan or tritan
+ * confusion line (a straight line in CIE 1931 xy through that type's copunctal
+ * point), with matched luminance. Every swatch then gets a small random
+ * lightness jitter so brightness can't reveal the odd one out.
+ * Stimuli are original odd-one-out swatches and dotted SVG "plate" digits —
  * not Ishihara plates (those images are copyrighted).
  */
+
+import { confusionPair, scaleLuminance, seededRandom } from './colour.js';
 
 /**
  * @typedef {Object} SwatchOption
@@ -20,6 +25,7 @@
  * @property {string} prompt
  * @property {SwatchOption[]} options
  * @property {string} correct Option id of the odd one out
+ * @property {[string, string]} [pair] Base confusion pair [majority, odd] before jitter
  */
 
 /**
@@ -33,174 +39,122 @@
  * @property {string} ground Colour of the ground dots
  * @property {{ id: string, label: string }[]} options Answer choices (digit strings + "none")
  * @property {string} correct
+ * @property {[string, string]} [pair] Base confusion pair [figure, ground]
  */
 
 /**
  * @typedef {OddOutItem|PlateItem} TestItem
  */
 
-/** @type {ReadonlyArray<TestItem>} */
-export const ITEMS = Object.freeze([
-  // —— Protan (reds / greens along L-cone confusion) ——
-  Object.freeze({
-    id: 'p1',
-    kind: 'odd-out',
-    axis: 'protan',
-    prompt: 'Which swatch looks different from the other three?',
-    options: Object.freeze([
-      Object.freeze({ id: 'a', colour: '#c45c4a', label: 'Swatch A' }),
-      Object.freeze({ id: 'b', colour: '#c45c4a', label: 'Swatch B' }),
-      Object.freeze({ id: 'c', colour: '#6a9a4e', label: 'Swatch C' }), // odd for normal; on protan line vs reds
-      Object.freeze({ id: 'd', colour: '#c45c4a', label: 'Swatch D' }),
-    ]),
-    correct: 'c',
-  }),
-  Object.freeze({
-    id: 'p2',
-    kind: 'odd-out',
-    axis: 'protan',
-    prompt: 'Which swatch looks different from the other three?',
-    options: Object.freeze([
-      Object.freeze({ id: 'a', colour: '#8fbf5a', label: 'Swatch A' }),
-      Object.freeze({ id: 'b', colour: '#d07060', label: 'Swatch B' }),
-      Object.freeze({ id: 'c', colour: '#8fbf5a', label: 'Swatch C' }),
-      Object.freeze({ id: 'd', colour: '#8fbf5a', label: 'Swatch D' }),
-    ]),
-    correct: 'b',
-  }),
-  Object.freeze({
-    id: 'p3',
-    kind: 'plate',
-    axis: 'protan',
-    prompt: 'What digit do you see in the circle? Choose “None” if you see no clear digit.',
-    digit: '5',
-    figure: '#d07060',
-    ground: '#8fbf5a',
-    options: Object.freeze([
-      Object.freeze({ id: '3', label: '3' }),
-      Object.freeze({ id: '5', label: '5' }),
-      Object.freeze({ id: '8', label: '8' }),
-      Object.freeze({ id: 'none', label: 'None' }),
-    ]),
-    correct: '5',
-  }),
+/** Max relative luminance jitter per swatch (±8 % of Y, about ±2 L*). */
+export const SWATCH_JITTER = 0.08;
 
-  // —— Deutan (similar red–green, shifted for M-cone) ——
-  Object.freeze({
-    id: 'd1',
-    kind: 'odd-out',
-    axis: 'deutan',
-    prompt: 'Which swatch looks different from the other three?',
-    options: Object.freeze([
-      Object.freeze({ id: 'a', colour: '#b85c6a', label: 'Swatch A' }),
-      Object.freeze({ id: 'b', colour: '#b85c6a', label: 'Swatch B' }),
-      Object.freeze({ id: 'c', colour: '#b85c6a', label: 'Swatch C' }),
-      Object.freeze({ id: 'd', colour: '#5a9a6a', label: 'Swatch D' }),
-    ]),
-    correct: 'd',
-  }),
-  Object.freeze({
-    id: 'd2',
-    kind: 'odd-out',
-    axis: 'deutan',
-    prompt: 'Which swatch looks different from the other three?',
-    options: Object.freeze([
-      Object.freeze({ id: 'a', colour: '#70b060', label: 'Swatch A' }),
-      Object.freeze({ id: 'b', colour: '#c06070', label: 'Swatch B' }),
-      Object.freeze({ id: 'c', colour: '#70b060', label: 'Swatch C' }),
-      Object.freeze({ id: 'd', colour: '#70b060', label: 'Swatch D' }),
-    ]),
-    correct: 'b',
-  }),
-  Object.freeze({
-    id: 'd3',
-    kind: 'plate',
-    axis: 'deutan',
-    prompt: 'What digit do you see in the circle? Choose “None” if you see no clear digit.',
-    digit: '2',
-    figure: '#c06070',
-    ground: '#70b060',
-    options: Object.freeze([
-      Object.freeze({ id: '2', label: '2' }),
-      Object.freeze({ id: '7', label: '7' }),
-      Object.freeze({ id: '9', label: '9' }),
-      Object.freeze({ id: 'none', label: 'None' }),
-    ]),
-    correct: '2',
-  }),
+const ODD_PROMPT = 'Which swatch looks different from the other three?';
+const PLATE_PROMPT = 'What digit do you see in the circle? Choose “None” if you see no clear digit.';
 
-  // —— Tritan (blue–yellow / S-cone) ——
-  Object.freeze({
-    id: 't1',
-    kind: 'odd-out',
-    axis: 'tritan',
-    prompt: 'Which swatch looks different from the other three?',
-    options: Object.freeze([
-      Object.freeze({ id: 'a', colour: '#4a7ab8', label: 'Swatch A' }),
-      Object.freeze({ id: 'b', colour: '#c8b040', label: 'Swatch B' }),
-      Object.freeze({ id: 'c', colour: '#4a7ab8', label: 'Swatch C' }),
-      Object.freeze({ id: 'd', colour: '#4a7ab8', label: 'Swatch D' }),
-    ]),
-    correct: 'b',
-  }),
-  Object.freeze({
-    id: 't2',
-    kind: 'odd-out',
-    axis: 'tritan',
-    prompt: 'Which swatch looks different from the other three?',
-    options: Object.freeze([
-      Object.freeze({ id: 'a', colour: '#d0a830', label: 'Swatch A' }),
-      Object.freeze({ id: 'b', colour: '#d0a830', label: 'Swatch B' }),
-      Object.freeze({ id: 'c', colour: '#d0a830', label: 'Swatch C' }),
-      Object.freeze({ id: 'd', colour: '#5078b0', label: 'Swatch D' }),
-    ]),
-    correct: 'd',
-  }),
-  Object.freeze({
-    id: 't3',
-    kind: 'plate',
-    axis: 'tritan',
-    prompt: 'What digit do you see in the circle? Choose “None” if you see no clear digit.',
-    digit: '6',
-    figure: '#d0a830',
-    ground: '#5078b0',
-    options: Object.freeze([
-      Object.freeze({ id: '4', label: '4' }),
-      Object.freeze({ id: '6', label: '6' }),
-      Object.freeze({ id: '8', label: '8' }),
-      Object.freeze({ id: 'none', label: 'None' }),
-    ]),
-    correct: '6',
-  }),
+/**
+ * Item specs. `centre` is a CIE xy chromaticity, `Y` the shared luminance and
+ * `spread` the xy distance of each colour from the centre along the confusion line.
+ * Values were checked to stay in the sRGB gamut, to give CIEDE2000 >= 12 for
+ * normal vision and <= 4 under a severity-1.0 dichromat simulation.
+ */
+const SPECS = [
+  // —— Protan (L-cone confusion lines: orange/brown vs olive/green) ——
+  { id: 'p1', axis: 'protan', kind: 'odd-out', centre: { x: 0.4, y: 0.4 }, Y: 0.25, spread: 0.035, correct: 'c' },
+  { id: 'p2', axis: 'protan', kind: 'odd-out', centre: { x: 0.38, y: 0.41 }, Y: 0.3, spread: 0.04, correct: 'b', swap: true },
+  { id: 'p3', axis: 'protan', kind: 'plate', centre: { x: 0.36, y: 0.42 }, Y: 0.35, spread: 0.035, digit: '5', choices: ['3', '5', '8'] },
+  // —— Deutan (M-cone confusion lines) ——
+  { id: 'd1', axis: 'deutan', kind: 'odd-out', centre: { x: 0.39, y: 0.4 }, Y: 0.28, spread: 0.035, correct: 'd' },
+  { id: 'd2', axis: 'deutan', kind: 'odd-out', centre: { x: 0.4, y: 0.4 }, Y: 0.25, spread: 0.045, correct: 'b', swap: true },
+  { id: 'd3', axis: 'deutan', kind: 'plate', centre: { x: 0.37, y: 0.42 }, Y: 0.3, spread: 0.035, digit: '2', choices: ['2', '7', '9'] },
+  // —— Tritan (S-cone confusion lines: violet/pink vs yellow-green, blue-grey vs green) ——
+  { id: 't1', axis: 'tritan', kind: 'odd-out', centre: { x: 0.34, y: 0.34 }, Y: 0.3, spread: 0.03, correct: 'b' },
+  { id: 't2', axis: 'tritan', kind: 'odd-out', centre: { x: 0.33, y: 0.36 }, Y: 0.35, spread: 0.035, correct: 'd', swap: true },
+  { id: 't3', axis: 'tritan', kind: 'plate', centre: { x: 0.38, y: 0.36 }, Y: 0.25, spread: 0.035, digit: '6', choices: ['4', '6', '8'] },
+];
 
-  // —— Controls (large luminance / hue difference; most people should pass) ——
-  Object.freeze({
-    id: 'c1',
-    kind: 'odd-out',
-    axis: 'control',
-    prompt: 'Which swatch looks different from the other three?',
-    options: Object.freeze([
-      Object.freeze({ id: 'a', colour: '#2a2a2a', label: 'Swatch A' }),
-      Object.freeze({ id: 'b', colour: '#2a2a2a', label: 'Swatch B' }),
-      Object.freeze({ id: 'c', colour: '#e8e8e8', label: 'Swatch C' }),
-      Object.freeze({ id: 'd', colour: '#2a2a2a', label: 'Swatch D' }),
-    ]),
-    correct: 'c',
-  }),
-  Object.freeze({
-    id: 'c2',
-    kind: 'odd-out',
-    axis: 'control',
-    prompt: 'Which swatch looks different from the other three?',
-    options: Object.freeze([
-      Object.freeze({ id: 'a', colour: '#0057a8', label: 'Swatch A' }),
-      Object.freeze({ id: 'b', colour: '#f0f0f0', label: 'Swatch B' }),
-      Object.freeze({ id: 'c', colour: '#f0f0f0', label: 'Swatch C' }),
-      Object.freeze({ id: 'd', colour: '#f0f0f0', label: 'Swatch D' }),
-    ]),
-    correct: 'a',
-  }),
-]);
+/** Controls: large luminance difference; most people should pass. */
+const CONTROLS = [
+  { id: 'c1', base: '#2a2a2a', odd: '#e8e8e8', correct: 'c' },
+  { id: 'c2', base: '#f0f0f0', odd: '#0057a8', correct: 'a' },
+];
+
+const LETTERS = ['a', 'b', 'c', 'd'];
+
+/**
+ * Build the item bank. Colours on the confusion lines are fixed; the lightness
+ * jitter comes from `seed`, so a page load gets fresh jitter and tests are repeatable.
+ * @param {number} seed
+ * @returns {ReadonlyArray<TestItem>}
+ */
+export function buildItems(seed) {
+  const rand = seededRandom(seed);
+  const jitter = (hex) => scaleLuminance(hex, 1 + (rand() * 2 - 1) * SWATCH_JITTER);
+  /** @type {TestItem[]} */
+  const items = [];
+
+  for (const spec of SPECS) {
+    const [a, b] = confusionPair(spec);
+    const pair = /** @type {[string, string]} */ (spec.swap ? [b, a] : [a, b]);
+    if (spec.kind === 'odd-out') {
+      items.push({
+        id: spec.id,
+        kind: 'odd-out',
+        axis: spec.axis,
+        prompt: ODD_PROMPT,
+        pair,
+        options: LETTERS.map((id) => ({
+          id,
+          colour: jitter(id === spec.correct ? pair[1] : pair[0]),
+          label: `Swatch ${id.toUpperCase()}`,
+        })),
+        correct: spec.correct,
+      });
+    } else {
+      items.push({
+        id: spec.id,
+        kind: 'plate',
+        axis: spec.axis,
+        prompt: PLATE_PROMPT,
+        digit: spec.digit,
+        pair,
+        figure: pair[0],
+        ground: pair[1],
+        options: [...spec.choices.map((d) => ({ id: d, label: d })), { id: 'none', label: 'None' }],
+        correct: spec.digit,
+      });
+    }
+  }
+
+  for (const c of CONTROLS) {
+    items.push({
+      id: c.id,
+      kind: 'odd-out',
+      axis: 'control',
+      prompt: ODD_PROMPT,
+      options: LETTERS.map((id) => ({
+        id,
+        colour: id === c.correct ? c.odd : c.base,
+        label: `Swatch ${id.toUpperCase()}`,
+      })),
+      correct: c.correct,
+    });
+  }
+
+  return deepFreeze(items);
+}
+
+/** @template T @param {T} o @returns {T} */
+function deepFreeze(o) {
+  if (o && typeof o === 'object') {
+    Object.values(o).forEach(deepFreeze);
+    Object.freeze(o);
+  }
+  return o;
+}
+
+/** Item bank for this page load (fresh lightness jitter each load). */
+export const ITEMS = buildItems(Math.floor(Math.random() * 2 ** 32));
 
 /** Scoreable projection used by scoring.js */
 export function scoreableItems() {
