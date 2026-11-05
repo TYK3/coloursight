@@ -1,6 +1,36 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { profileToCorrector } from './preview.js';
+import { profileToCorrector, TRITAN_DEMO_DOTS } from './preview.js';
+import { simulateRgb } from '../correct/correct.js';
+
+function hexToRgb(hex) {
+  const n = hex.replace('#', '');
+  return [parseInt(n.slice(0, 2), 16), parseInt(n.slice(2, 4), 16), parseInt(n.slice(4, 6), 16)];
+}
+
+function dist(a, b) {
+  return Math.sqrt(a.reduce((sum, v, i) => sum + (v - b[i]) ** 2, 0));
+}
+
+test('sample-scene pair: blue/green dots are distinct normally but collapse under tritan simulation', () => {
+  const [[blueHex], [greenHex]] = TRITAN_DEMO_DOTS;
+  const blue = hexToRgb(blueHex);
+  const green = hexToRgb(greenHex);
+  const normalDist = dist(blue, green);
+  const tritanDist = dist(simulateRgb(...blue, 'tritan'), simulateRgb(...green, 'tritan'));
+  assert.ok(normalDist > 100, `expected the pair to read as clearly different normally, got ${normalDist}`);
+  assert.ok(tritanDist < 30, `expected the pair to collapse under tritan simulation, got ${tritanDist}`);
+});
+
+test('sample-scene pair: still distinguishable under protan/deutan simulation', () => {
+  const [[blueHex], [greenHex]] = TRITAN_DEMO_DOTS;
+  const blue = hexToRgb(blueHex);
+  const green = hexToRgb(greenHex);
+  for (const type of ['protan', 'deutan']) {
+    const d = dist(simulateRgb(...blue, type), simulateRgb(...green, type));
+    assert.ok(d > 100, `expected the pair to stay distinguishable under ${type}, got ${d}`);
+  }
+});
 
 test('normal maps to zero strength', () => {
   assert.deepEqual(

@@ -38,12 +38,44 @@ function strengthOf(profile) {
   return typeof c === 'number' && Number.isFinite(c) ? Math.min(1, Math.max(0, c)) : 1;
 }
 
+/** LMS round-trip for `type`, unclamped. Returns [r, g, b] floats. */
+function simulateRaw(r, g, b, type) {
+  if (!SIM[type]) return [r, g, b];
+  return mul(LMS2RGB, mul(SIM[type], mul(RGB2LMS, [r, g, b])));
+}
+
+/**
+ * Simulate how a colour appears to a viewer with the given colour-vision
+ * deficiency type ('protan' | 'deutan' | 'tritan'). Any other type is
+ * returned unchanged. Returns [r, g, b] (0..255 ints).
+ */
+export function simulateRgb(r, g, b, type) {
+  const [sr, sg, sb] = simulateRaw(r, g, b, type);
+  return [clamp(sr), clamp(sg), clamp(sb)];
+}
+
+/**
+ * Simulate an ImageData-like frame { width, height, data: Uint8ClampedArray RGBA }
+ * for the given colour-vision deficiency type. Never mutates the input.
+ */
+export function simulateImageData(imageData, type) {
+  const { width, height, data } = imageData;
+  const out = new Uint8ClampedArray(data);
+  if (SIM[type]) {
+    for (let i = 0; i < out.length; i += 4) {
+      const [r, g, b] = simulateRgb(out[i], out[i + 1], out[i + 2], type);
+      out[i] = r; out[i + 1] = g; out[i + 2] = b;
+    }
+  }
+  if (typeof ImageData !== 'undefined') return new ImageData(out, width, height);
+  return { width, height, data: out };
+}
+
 /** Correct one pixel. Returns [r, g, b] (0..255 ints). */
 export function correctRgb(r, g, b, profile) {
   const k = strengthOf(profile);
   if (k === 0) return [r, g, b];
-  const rgb = [r, g, b];
-  const sim = mul(LMS2RGB, mul(SIM[profile.type], mul(RGB2LMS, rgb)));
+  const sim = simulateRaw(r, g, b, profile.type);
   const shift = mul(ERR, [r - sim[0], g - sim[1], b - sim[2]]);
   return [clamp(r + k * shift[0]), clamp(g + k * shift[1]), clamp(b + k * shift[2])];
 }
