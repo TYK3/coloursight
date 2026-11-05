@@ -1,4 +1,5 @@
 // Minimal hash router: shows the matching [data-view] section and marks the active nav link.
+// The camera tool is the live/ page. #camera is only an explainer that links there.
 const DEFAULT_ROUTE = 'home';
 
 export function currentRoute() {

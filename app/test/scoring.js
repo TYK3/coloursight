@@ -140,19 +140,14 @@ export function scoreAnswers(rawAnswers, items, opts = {}) {
  */
 export function summariseResult(result) {
   const labels = {
-    normal: 'No strong colour-confusion pattern',
-    protan: 'Protan-like pattern (red–green, L-cone)',
-    deutan: 'Deutan-like pattern (red–green, M-cone)',
-    tritan: 'Tritan-like pattern (blue–yellow, S-cone)',
+    normal: 'Your answers do not suggest a colour-confusion pattern',
+    protan: 'Your answers suggest red–green confusion (protan type)',
+    deutan: 'Your answers suggest red–green confusion (deutan type)',
+    tritan: 'Your answers suggest blue–yellow confusion (tritan type)',
   };
   const headline = labels[result.type] ?? labels.normal;
   const pct = (n) => `${Math.round(n * 100)}%`;
-  const detail =
-    `Screening scores (higher = more errors on that axis): ` +
-    `protan ${pct(result.scores.protan)}, ` +
-    `deutan ${pct(result.scores.deutan)}, ` +
-    `tritan ${pct(result.scores.tritan)}. ` +
-    `Confidence ${pct(result.confidence)}.`;
+  const detail = `Confidence ${pct(result.confidence)}.`;
   return { headline, detail };
 }
 

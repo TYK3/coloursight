@@ -98,7 +98,24 @@ describe('summariseResult', () => {
       { now: fixedNow },
     );
     const summary = summariseResult(result);
-    assert.match(summary.headline, /No strong colour-confusion/i);
-    assert.match(summary.detail, /protan/);
+    assert.match(summary.headline, /do not suggest a colour-confusion pattern/i);
+    assert.match(summary.detail, /Confidence/i);
+    assert.doesNotMatch(summary.detail, /protan \d/);
+  });
+
+  it('names a protan pattern in plain language', () => {
+    const result = scoreAnswers(
+      items.map((it) => ({
+        itemId: it.id,
+        choice: it.axis === 'protan' ? 'wrong' : it.correct,
+      })),
+      items,
+      { now: fixedNow },
+    );
+    const summary = summariseResult(result);
+    assert.equal(
+      summary.headline,
+      'Your answers suggest red–green confusion (protan type)',
+    );
   });
 });

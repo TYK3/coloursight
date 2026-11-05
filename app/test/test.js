@@ -219,17 +219,18 @@ export class ColourVisionTest {
     return `
       <p class="cs-test__progress">Results</p>
       <h2 class="cs-test__heading" id="cs-test-heading">${escapeHtml(headline)}</h2>
-      <p class="cs-test__lead">${escapeHtml(detail)}</p>
+      <p class="cs-test__lead">${escapeHtml(detail)} Preview and camera now correct for this. Change it in <a href="#settings">Settings</a>.</p>
       <ul class="cs-test__result-scores">
         <li>Protan error rate: ${Math.round(result.scores.protan * 100)}%</li>
         <li>Deutan error rate: ${Math.round(result.scores.deutan * 100)}%</li>
         <li>Tritan error rate: ${Math.round(result.scores.tritan * 100)}%</li>
         <li>Controls correct: ${result.controlCorrect} / ${result.controlTotal}</li>
       </ul>
-      <p class="cs-test__disclaimer"><strong>Screening only — not a diagnosis.</strong> Colour vision varies with lighting, display calibration and fatigue. See an optometrist or ophthalmologist for a clinical assessment. Your result is saved locally as <code>${RESULT_STORAGE_KEY}</code> for the camera tools.</p>
+      <p class="cs-test__disclaimer"><strong>Screening only — not a diagnosis.</strong> Colour vision varies with lighting, display calibration and fatigue. See an optometrist or ophthalmologist for a clinical assessment.</p>
       <div class="cs-test__nav">
         <button type="button" data-action="retake">Retake test</button>
-        <a class="button cs-test__primary" href="#camera" style="display:inline-block">Go to camera</a>
+        <a class="button button--secondary" href="live/">Open live camera</a>
+        <a class="button" href="#preview">See your colours corrected</a>
       </div>
     `;
   }

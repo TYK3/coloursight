@@ -21,15 +21,23 @@ export function mountLive(root) {
       </div>
     </div>
     <p class="cs-live__profile" aria-live="polite"></p>
-    <p class="cs-live__error" role="alert" hidden></p>
-    <canvas class="cs-live__display" aria-label="Live camera feed"></canvas>
+    <p class="cs-live__notice" id="cs-live-notice" hidden>No colour profile yet → <a href="../#test">Take the test</a>. Corrected view stays off until you have a profile.</p>
+    <p class="cs-live__error" role="alert" hidden><span class="cs-live__error-prefix">Camera problem:</span> <span class="cs-live__error-text"></span></p>
+    <div class="cs-live__stage">
+      <canvas class="cs-live__display" aria-label="Live camera feed"></canvas>
+      <p class="cs-live__idle">Press Start camera; your browser will ask for permission. Video stays on this device.</p>
+    </div>
     <p class="cs-live__disclaimer">This is assistive colour remapping to help tell colours apart. It does not restore normal colour vision and is not a medical device.</p>
   `;
 
   const startBtn = root.querySelector('.cs-live__start');
   const modeBtns = root.querySelectorAll('[data-mode]');
   const profileEl = root.querySelector('.cs-live__profile');
+  const noticeEl = root.querySelector('.cs-live__notice');
   const errorEl = root.querySelector('.cs-live__error');
+  const errorTextEl = root.querySelector('.cs-live__error-text');
+  const stageEl = root.querySelector('.cs-live__stage');
+  const idleEl = root.querySelector('.cs-live__idle');
   const display = root.querySelector('.cs-live__display');
   const dctx = display.getContext('2d');
   const source = document.createElement('canvas');
@@ -40,14 +48,34 @@ export function mountLive(root) {
   let corrector = profileToCorrector(profile);
   let rafId = 0;
 
+  function setMode(next) {
+    mode = next;
+    modeBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
+  }
+
   function renderProfile() {
-    const label = profile?.severityLabel ? ` (${profile.severityLabel})` : '';
-    profileEl.textContent = `Profile: ${profile?.type || 'normal'}${label}` +
+    const missing = !profile || profile.source === 'default';
+    const correctedBtn = root.querySelector('[data-mode="corrected"]');
+    noticeEl.hidden = !missing;
+    profileEl.hidden = missing;
+    if (correctedBtn) {
+      correctedBtn.disabled = missing;
+      if (missing) correctedBtn.setAttribute('aria-describedby', 'cs-live-notice');
+      else correctedBtn.removeAttribute('aria-describedby');
+    }
+    if (missing) {
+      if (mode === 'corrected') setMode('original');
+      return;
+    }
+    const label = profile.severityLabel && profile.severityLabel !== 'none'
+      ? ` (${profile.severityLabel})`
+      : '';
+    profileEl.textContent = `Profile: ${profile.type || 'normal'}${label}` +
       (corrector.type === 'normal' ? ' — no correction applied' : '');
   }
 
   function showError(msg) {
-    errorEl.textContent = msg || '';
+    errorTextEl.textContent = msg || '';
     errorEl.hidden = !msg;
   }
 
@@ -56,6 +84,9 @@ export function mountLive(root) {
     onState: (s) => {
       startBtn.textContent = s === 'running' ? 'Stop camera' : s === 'starting' ? 'Starting…' : 'Start camera';
       startBtn.disabled = s === 'starting';
+      const running = s === 'running';
+      stageEl.classList.toggle('is-running', running);
+      idleEl.hidden = running;
     },
     onError: showError,
   });
@@ -100,8 +131,8 @@ export function mountLive(root) {
 
   modeBtns.forEach((btn) =>
     btn.addEventListener('click', () => {
-      mode = btn.dataset.mode;
-      modeBtns.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      if (btn.disabled) return;
+      setMode(btn.dataset.mode);
     }),
   );
 
