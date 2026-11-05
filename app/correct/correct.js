@@ -22,8 +22,15 @@ const SIM = {
   deutan: [[1, 0, 0], [0.494207, 0, 1.24827], [0, 0, 1]],
   tritan: [[1, 0, 0], [0, 1, 0], [-0.395913, 0.801109, 0]],
 };
-// Redistributes the lost error into visible channels.
-const ERR = [[0, 0, 0], [0.7, 1, 0], [0.7, 0, 1]];
+// Redistributes the lost error into visible channels. Protan/deutan lose
+// red-green (L/M cone) separation, so red's error is folded into green/blue.
+// Tritan loses blue-yellow (S cone) separation instead, so the direction is
+// reversed: blue's error is folded into red/green, the axis tritans keep.
+const ERR = {
+  protan: [[0, 0, 0], [0.7, 1, 0], [0.7, 0, 1]],
+  deutan: [[0, 0, 0], [0.7, 1, 0], [0.7, 0, 1]],
+  tritan: [[1, 0, 0.7], [0, 1, 0.7], [0, 0, 0]],
+};
 
 const mul = (m, v) => [
   m[0][0] * v[0] + m[0][1] * v[1] + m[0][2] * v[2],
@@ -76,7 +83,7 @@ export function correctRgb(r, g, b, profile) {
   const k = strengthOf(profile);
   if (k === 0) return [r, g, b];
   const sim = simulateRaw(r, g, b, profile.type);
-  const shift = mul(ERR, [r - sim[0], g - sim[1], b - sim[2]]);
+  const shift = mul(ERR[profile.type], [r - sim[0], g - sim[1], b - sim[2]]);
   return [clamp(r + k * shift[0]), clamp(g + k * shift[1]), clamp(b + k * shift[2])];
 }
 

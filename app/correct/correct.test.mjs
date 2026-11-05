@@ -1,6 +1,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { correctImageData, correctRgb, simulateImageData, simulateRgb } from './correct.js';
+import { deltaE2000 } from '../test/colour.js';
+
+function hexToRgb(hex) {
+  const n = hex.replace('#', '');
+  return [parseInt(n.slice(0, 2), 16), parseInt(n.slice(2, 4), 16), parseInt(n.slice(4, 6), 16)];
+}
+function rgbToHex([r, g, b]) {
+  return '#' + [r, g, b].map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
+}
 
 function fixture() {
   // red, green, blue, yellow, grey, orange
@@ -76,4 +85,30 @@ test('simulateImageData: unknown type returns an unchanged copy', () => {
   const out = simulateImageData(img, 'xyz');
   assert.deepEqual([...out.data], [...img.data]);
   assert.notEqual(out.data, img.data);
+});
+
+test('tritan correction separates the sample-scene blue/green pair under simulation', () => {
+  const blue = hexToRgb('#1976d2');
+  const green = hexToRgb('#2e7d32');
+  const profile = { type: 'tritan', confidence: 1 };
+
+  const before = deltaE2000(
+    rgbToHex(simulateRgb(...blue, 'tritan')),
+    rgbToHex(simulateRgb(...green, 'tritan')),
+  );
+  const after = deltaE2000(
+    rgbToHex(simulateRgb(...correctRgb(...blue, profile), 'tritan')),
+    rgbToHex(simulateRgb(...correctRgb(...green, profile), 'tritan')),
+  );
+
+  assert.ok(after > before * 2, `expected >2x separation, got ${before} -> ${after}`);
+  assert.ok(after > 10, `expected clearly distinguishable (CIEDE2000 > 10), got ${after}`);
+});
+
+test('tritan correction leaves neutral greys roughly neutral', () => {
+  for (const grey of [32, 64, 96, 128, 160, 192, 224]) {
+    const [r, g, b] = correctRgb(grey, grey, grey, { type: 'tritan', confidence: 1 });
+    assert.ok(Math.abs(r - grey) <= 2 && Math.abs(g - grey) <= 2 && Math.abs(b - grey) <= 2,
+      `expected grey ${grey} to stay near-neutral, got [${r},${g},${b}]`);
+  }
 });
