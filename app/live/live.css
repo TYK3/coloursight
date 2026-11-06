@@ -35,7 +35,9 @@
 .cs-live button:focus-visible { outline: 3px solid var(--colour-focus); outline-offset: 2px; }
 .cs-live__stage {
   position: relative;
-  background: #111;
+  background: var(--colour-surface);
+  border: 2px solid var(--colour-border);
+  padding-top: 2.5rem;
   border-radius: var(--radius);
   overflow: hidden;
   min-height: 12rem;
@@ -45,15 +47,15 @@
 .cs-live__stage:not(.is-running) .cs-live__display { display: none; }
 .cs-live__idle {
   position: absolute;
-  inset: 0;
+  inset: 2.5rem 0 0;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0;
   padding: var(--space-4);
   text-align: center;
-  color: var(--colour-bg);
-  background: #111;
+  color: var(--colour-muted);
+  background: var(--colour-bg);
 }
 .cs-live__idle[hidden] { display: none; }
 .cs-live__error {
@@ -79,3 +81,16 @@
 .cs-live__profile, .cs-live__disclaimer { margin: 0; }
 .cs-live__profile { color: var(--colour-text); }
 .cs-live__disclaimer { font-size: 0.875rem; color: var(--colour-muted); }
+
+.cs-live__stage-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--colour-surface);
+  color: var(--colour-text);
+  border-bottom: 1px solid var(--colour-border);
+  font-size: 0.875rem;
+  font-weight: 600;
+}

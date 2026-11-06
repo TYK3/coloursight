@@ -3,7 +3,7 @@
 .cs-preview {
   position: relative;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  color: #1a1a1a;
+  color: var(--colour-text);
   max-width: 48rem;
 }
 
@@ -15,9 +15,9 @@
 .cs-preview__disclaimer {
   margin: 0 0 1rem;
   padding: 0.5rem 0.75rem;
-  background: #fff8e6;
-  border-left: 3px solid #b35900;
-  color: #4a4a4a;
+  background: var(--colour-surface);
+  border-left: 3px solid var(--colour-focus);
+  color: var(--colour-muted);
   font-size: 0.95rem;
 }
 
@@ -33,21 +33,12 @@
 
 .cs-preview__sim-note {
   margin: 0 0 0.75rem;
-  color: #4a4a4a;
+  color: var(--colour-muted);
   font-size: 0.95rem;
 }
 
 .cs-preview__sim-toggle {
   margin-bottom: 0.75rem;
-}
-
-.cs-preview__sim-toggle[aria-pressed="true"],
-.cs-preview__btn.cs-preview__sim-toggle[aria-pressed="true"]:hover,
-.cs-preview__btn.cs-preview__sim-toggle[aria-pressed="true"]:focus-visible {
-  background: #0057a8;
-  border-color: #0057a8;
-  color: #fff;
-  text-decoration: underline;
 }
 
 .cs-preview__btn:disabled {
@@ -66,30 +57,30 @@
 .cs-preview__btn {
   font: inherit;
   padding: 0.45rem 0.9rem;
-  border: 1px solid #767676;
+  border: 1px solid var(--colour-border);
   border-radius: 0.5rem;
-  background: #fff;
-  color: #1a1a1a;
+  background: var(--colour-surface);
+  color: var(--colour-text);
   cursor: pointer;
 }
 
 .cs-preview__btn:hover {
-  background: #f0f0f0;
+  background: var(--colour-bg);
 }
 
 .cs-preview__btn:focus-visible {
-  outline: 2px solid #b35900;
+  outline: 2px solid var(--colour-focus);
   outline-offset: 2px;
 }
 
 .cs-preview__btn--primary {
-  background: #0057a8;
-  border-color: #0057a8;
-  color: #fff;
+  background: var(--colour-accent);
+  border-color: var(--colour-accent);
+  color: var(--colour-accent-text);
 }
 
 .cs-preview__btn--primary:hover {
-  background: #004687;
+  background: var(--colour-accent);
 }
 
 .cs-preview__file-input {
@@ -108,7 +99,7 @@
 .cs-preview__status {
   min-height: 1.4em;
   margin: 0 0 1rem;
-  color: #4a4a4a;
+  color: var(--colour-muted);
   font-size: 0.95rem;
 }
 
@@ -124,15 +115,40 @@
 
 .cs-preview__figure canvas {
   display: block;
-  border: 1px solid #767676;
+  border: 1px solid var(--colour-border);
   border-radius: 0.25rem;
   max-width: 100%;
-  background: #fff;
+  background: var(--colour-surface);
 }
 
 .cs-preview__figure figcaption {
   text-align: center;
   margin-top: 0.35rem;
   font-size: 0.9rem;
-  color: #4a4a4a;
+  color: var(--colour-muted);
 }
+
+.cs-preview__btn--primary:hover { text-decoration: underline; }
+.cs-preview__btn--text,
+.cs-preview__btn--text:hover {
+  background: transparent;
+  border-color: transparent;
+  color: var(--colour-accent);
+  text-decoration: underline;
+}
+.cs-preview__sim-toggle::before { content: '□ '; font-weight: 700; }
+.cs-preview__sim-toggle[aria-pressed="true"]::before { content: '✓ '; }
+.cs-preview__sim-toggle[aria-pressed="true"] {
+  border-style: dashed;
+  text-decoration: underline;
+}
+.cs-preview__example {
+  display: inline-block;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius);
+  background: var(--colour-surface);
+  color: var(--colour-text);
+  font-weight: 700;
+}
+.cs-preview__example[hidden] { display: none; }

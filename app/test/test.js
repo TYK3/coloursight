@@ -96,13 +96,21 @@ export class ColourVisionTest {
       ? `<p class="cs-test__lead">You have a previous screening result stored on this device (${escapeHtml(this.result.type)}, confidence ${Math.round(this.result.confidence * 100)}%). You can retake the test below.</p>`
       : '';
     return `
-      <p class="cs-test__progress">Colour-vision screening</p>
-      <h2 class="cs-test__heading" id="cs-test-heading">About this test</h2>
-      <p class="cs-test__lead">You will see ${TOTAL_STEPS} short steps. Some ask you to pick the odd swatch out; others ask which digit you can read in a dotted circle. Take your time, and make your best guess if you're unsure.</p>
-      ${prior}
-      <p class="cs-test__disclaimer"><strong>Screening only.</strong> This is not a clinical diagnosis. Results stay on your device and can guide the camera colour correction later.</p>
-      <div class="cs-test__nav">
-        <button type="button" class="cs-test__primary" data-action="start">Start test</button>
+      <div class="cs-test__intro">
+        <p class="cs-test__progress">Colour-vision screening</p>
+        <h2 class="cs-test__heading" id="cs-test-heading">About this test</h2>
+        <p class="cs-test__lead">About 3–5 minutes: ${TOTAL_STEPS} short plates and swatch tasks. Pick the odd swatch out or the digit you see. Take your time and make your best guess if unsure.</p>
+        <div class="cs-test__nav">
+          <button type="button" class="cs-test__primary" data-action="start">Start test</button>
+        </div>
+        <figure class="cs-test__intro-sample">
+          <div role="img" aria-label="Sample swatches showing the kind of colour comparison in the test; no answer is needed.">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <figcaption>Sample — not scored</figcaption>
+        </figure>
+        ${prior}
+        <p class="cs-test__disclaimer"><strong>Assistive screening only — not a diagnosis.</strong> Results stay on your device and can guide colour correction.</p>
       </div>
     `;
   }

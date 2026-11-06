@@ -24,6 +24,7 @@ export function mountLive(root) {
     <p class="cs-live__notice" id="cs-live-notice" hidden>No colour profile yet → <a href="../#test">Take the test</a>. Corrected view stays off until you have a profile.</p>
     <p class="cs-live__error" role="alert" hidden><span class="cs-live__error-prefix">Camera problem:</span> <span class="cs-live__error-text"></span></p>
     <div class="cs-live__stage">
+      <span class="cs-live__stage-label">Camera preview</span>
       <canvas class="cs-live__display" aria-label="Live camera feed"></canvas>
       <p class="cs-live__idle">Press Start camera; your browser will ask for permission. Video stays on this device.</p>
     </div>
