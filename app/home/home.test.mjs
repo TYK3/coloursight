@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { correctorForHome, captionForHome, HOME_FALLBACK_CORRECTOR } from './home.js';
+import { correctorForHome, captionForHome, explainForHome, HOME_FALLBACK_CORRECTOR } from './home.js';
 
 test('falls back to deutan moderate when there is no real profile', () => {
   for (const p of [null, undefined, {}, { type: 'normal', source: 'default' }]) {
@@ -21,4 +21,10 @@ test('caption names the active profile, or labels the fallback example', () => {
     captionForHome({ type: 'tritan', severity: 0.5, severityLabel: 'moderate', source: 'test' }),
     /your profile: tritan, moderate/i,
   );
+});
+
+test('explain line names red/green for the deutan fallback and protan, blue/green for tritan', () => {
+  assert.match(explainForHome(null), /reds and greens/i);
+  assert.match(explainForHome({ type: 'protan', severity: 0.4, source: 'test' }), /reds and greens/i);
+  assert.match(explainForHome({ type: 'tritan', severity: 0.4, source: 'test' }), /blues and greens/i);
 });

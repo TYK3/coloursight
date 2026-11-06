@@ -33,3 +33,17 @@ main:focus { outline: none; }
 }
 .site-footer { padding: var(--space-3) var(--space-4); color: var(--colour-muted); border-top: 1px solid var(--colour-border); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* Shared section-rhythm utilities (opt-in via class; no effect unless applied).
+   Two distinct quiet surfaces so sections don't all read as the same bordered card. */
+.section-band {
+  background: var(--colour-band);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+}
+.section-card {
+  background: var(--colour-surface);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+}

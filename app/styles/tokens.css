@@ -12,8 +12,14 @@
   --colour-accent: #0057a8;
   --colour-accent-text: #ffffff;
   --colour-focus: #b35900;
+  /* Quiet warm-neutral section band, between --colour-bg and --colour-surface.
+     Text contrast on it is effectively unchanged from --colour-bg (both near-white). */
+  --colour-band: #f2efe7;
 
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Local/system serif stack for page <h1> titles only — a second intentional
+     voice alongside --font-sans, no network font request. */
+  --font-display: ui-serif, Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
   --text-base: 1.0625rem;
   --leading: 1.6;
   --space-1: 0.25rem;
@@ -23,4 +29,7 @@
   --space-5: 2.5rem;
   --radius: 0.5rem;
   --max-width: 60rem;
+  /* Single orchestrated load animation duration (home hero only); the global
+     prefers-reduced-motion override in polish.css already caps this to 0.01ms. */
+  --motion-hero: 480ms;
 }

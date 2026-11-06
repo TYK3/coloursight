@@ -42,31 +42,39 @@
     </nav>
   </header>
   <main id="main" tabindex="-1">
-    <section id="view-home" data-view="home" aria-labelledby="h-home">
-      <h1 id="h-home">ColourSight</h1>
-      <p class="lead">Find out how you see colour, then see the world with colours remapped for you. Everything runs in your browser; nothing is uploaded.</p>
-      <div class="cs-home-strip" data-el="home-strip">
-        <p class="cs-home-strip__caption" data-el="home-strip-caption">Example profile: deutan, moderate — original vs corrected.</p>
-        <div class="cs-home-strip__pair">
-          <figure class="cs-home-strip__figure">
-            <canvas data-el="home-strip-before" width="320" height="240" aria-label="Original sample scene, before colour correction"></canvas>
-            <figcaption>Original</figcaption>
-          </figure>
-          <figure class="cs-home-strip__figure">
-            <canvas data-el="home-strip-after" width="320" height="240" aria-label="Same sample scene with colours corrected for the profile above"></canvas>
-            <figcaption>Corrected</figcaption>
-          </figure>
+    <section id="view-home" data-view="home" aria-labelledby="h-home" class="cs-home">
+      <h1 id="h-home" class="cs-home-title">See colour remapped for you.</h1>
+      <div class="cs-home-hero">
+        <div class="cs-home-hero__copy">
+          <p class="lead">Find out how you see colour, then see the world with colours remapped for you. Everything runs in your browser; nothing is uploaded.</p>
+          <p class="cs-home-actions">
+            <a class="button" href="#test">Take the 2-minute test</a>
+            <a class="button button--secondary" href="#preview">Try the correction preview</a>
+          </p>
+        </div>
+        <div class="cs-home-strip" data-el="home-strip">
+          <p class="cs-home-strip__caption" data-el="home-strip-caption">Example profile: deutan, moderate — original vs corrected.</p>
+          <div class="cs-home-strip__pair">
+            <figure class="cs-home-strip__figure">
+              <canvas data-el="home-strip-before" width="320" height="240" aria-label="Original sample scene, before colour correction"></canvas>
+              <figcaption>Original</figcaption>
+            </figure>
+            <figure class="cs-home-strip__figure cs-home-strip__figure--after">
+              <span class="cs-home-chip">Example</span>
+              <canvas data-el="home-strip-after" width="320" height="240" aria-label="Same sample scene with colours corrected for the profile above"></canvas>
+              <figcaption>Corrected</figcaption>
+            </figure>
+          </div>
+          <p class="cs-home-strip__explain" data-el="home-strip-explain">Reds and greens that would blend together are pulled apart, so warning colours stay distinguishable.</p>
         </div>
       </div>
-      <ol class="cs-home-steps">
-        <li><strong>Take the short test</strong> – a few quick steps with coloured swatches and dotted plates.</li>
-        <li><strong>Fine-tune your profile</strong> – adjust the type and correction intensity in Settings.</li>
-        <li><strong>See the difference</strong> – compare a photo before and after correction, or open the <a href="live/">live camera</a>.</li>
-      </ol>
-      <p class="cs-home-actions">
-        <a class="button" href="#test">Take the 2-minute test</a>
-        <a class="button button--secondary" href="#preview">Try the correction preview</a>
-      </p>
+      <div class="cs-home-steps-band section-card">
+        <ol class="cs-home-steps">
+          <li><strong>Take the short test</strong> – a few quick steps with coloured swatches and dotted plates.</li>
+          <li><strong>Fine-tune your profile</strong> – adjust the type and correction intensity in Settings.</li>
+          <li><strong>See the difference</strong> – compare a photo before and after correction, or open the <a href="live/">live camera</a>.</li>
+        </ol>
+      </div>
       <p class="cs-home-note">ColourSight is a screening and assistive tool, not a medical diagnosis.</p>
     </section>
     <section id="view-test" data-view="test" aria-labelledby="h-test" hidden>
