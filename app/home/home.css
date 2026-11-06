@@ -1,8 +1,53 @@
-/* Scoped under .cs-home-strip — home-page "original vs corrected" strip. */
+/* Home hero: headline, lead/CTAs and the "original vs corrected" demo card,
+   on a quiet tinted band; then a plain-surface "how it works" card; then a
+   plain disclaimer line. Three distinct quiet surfaces, not three identical
+   bordered cards (see fe-redesign-a-plan.md). */
+
+.cs-home-title {
+  background: var(--colour-band);
+  margin: 0;
+  padding: var(--space-4) var(--space-4) 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.cs-home-hero {
+  background: var(--colour-band);
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  border-radius: 0 0 var(--radius) var(--radius);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.cs-home-hero__copy {
+  flex: 1 1 18rem;
+  min-width: 16rem;
+  max-width: 26rem;
+}
+
+/* One orchestrated load animation for the hero band (title + hero row share
+   the same timing so it reads as a single reveal, not a staggered sequence).
+   The global prefers-reduced-motion override in polish.css caps this to
+   0.01ms for users who ask for less motion. */
+.cs-home-title,
+.cs-home-hero {
+  animation: cs-home-in var(--motion-hero) ease-out both;
+}
+@keyframes cs-home-in {
+  from { opacity: 0; transform: translateY(0.75rem); }
+  to { opacity: 1; transform: none; }
+}
 
 .cs-home-strip {
-  margin: var(--space-3) 0 var(--space-4);
-  max-width: 40rem;
+  margin: 0;
+  flex: 2 1 22rem;
+  max-width: 36rem;
+  background: var(--colour-surface);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
 }
 
 .cs-home-strip__caption {
@@ -19,9 +64,9 @@
 
 .cs-home-strip__figure {
   margin: 0;
-  flex: 1 1 9rem;
-  min-width: 0;
-  max-width: 14rem;
+  flex: 1 1 0;
+  min-width: 7rem;
+  position: relative;
 }
 
 .cs-home-strip__figure canvas {
@@ -40,6 +85,36 @@
   color: var(--colour-muted);
 }
 
+/* "Example" names the scene as a sample, not the viewer's own photo — the
+   meaning is carried by the text, colour is decoration only. */
+.cs-home-chip {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  background: var(--colour-accent);
+  color: var(--colour-accent-text);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  line-height: 1.4;
+}
+
+.cs-home-strip__explain {
+  margin: var(--space-3) 0 0;
+  color: var(--colour-muted);
+  font-size: 0.9rem;
+}
+
+.cs-home-steps-band { margin: 0 0 var(--space-4); }
+
+@media (max-width: 26rem) {
+  .cs-home-strip { padding: var(--space-2); }
+  .cs-home-strip__pair { gap: var(--space-2); }
+}
+
 @media (max-width: 22.5rem) {
-  .cs-home-strip__figure { flex: 1 1 100%; max-width: 100%; }
+  .cs-home-strip__figure { flex: 1 1 100%; }
 }
