@@ -48,6 +48,15 @@ export function profileToCorrector(profile) {
   return { type, confidence };
 }
 
+/** Select an example only when no personal profile has been saved. */
+export function previewCorrection(profile) {
+  const example = !profile || profile.source === 'default' || !profile.type;
+  return {
+    example,
+    corrector: profileToCorrector(example ? { type: 'deutan', severity: 0.6 } : profile),
+  };
+}
+
 /**
  * Call `refresh` whenever the Preview route is shown, so the view never keeps
  * a profile that went stale while it was hidden (e.g. after finishing the test).
@@ -144,9 +153,9 @@ export function mountPreview(root) {
       Show as a <span data-el="sim-toggle-type">deutan</span> viewer sees it
     </button>
     <div class="cs-preview__toolbar">
-      <button type="button" class="cs-preview__btn" data-el="sample-btn">Load sample scene</button>
+      <button type="button" class="cs-preview__btn cs-preview__btn--primary" data-el="sample-btn">Load sample scene</button>
       <button type="button" class="cs-preview__btn" data-el="upload-btn">Upload your own photo…</button>
-      <button type="button" class="cs-preview__btn" data-el="apply-btn">Re-apply</button>
+      <button type="button" class="cs-preview__btn cs-preview__btn--text" data-el="apply-btn">Re-apply</button>
     </div>
     <input type="file" accept="image/*" data-el="file-input" class="cs-preview__file-input" tabindex="-1" aria-hidden="true" />
     <p class="cs-preview__status" data-el="status" aria-live="polite"></p>
@@ -157,7 +166,7 @@ export function mountPreview(root) {
       </figure>
       <figure class="cs-preview__figure">
         <canvas data-el="after" width="${SAMPLE_W}" height="${SAMPLE_H}" aria-label="Corrected image"></canvas>
-        <figcaption>After</figcaption>
+        <figcaption>After <span class="cs-preview__example" data-el="example-label" hidden>Example</span></figcaption>
       </figure>
     </div>
   `;
@@ -245,7 +254,9 @@ export function mountPreview(root) {
   function applyCorrection(lead) {
     const profile = getProfile();
     summaryEl.textContent = formatProfile(profile);
-    const mapped = profileToCorrector(profile);
+    const { example, corrector: mapped } = previewCorrection(profile);
+    el('example-label').hidden = !example;
+    afterCanvas.setAttribute('aria-label', example ? 'Example corrected image' : 'Corrected image');
     updateSimToggle(mapped.type);
     if (!sourceImageData) return;
 
@@ -257,7 +268,9 @@ export function mountPreview(root) {
     afterCtx.putImageData(afterOut, 0, 0);
 
     const strength = mapped.confidence;
-    const applied = mapped.type === 'normal' || strength === 0
+    const applied = example
+      ? 'Example correction: deutan, moderate — reds and greens pulled apart.'
+      : mapped.type === 'normal' || strength === 0
       ? 'No remapping applied (normal profile or zero strength).'
       : `Applied ${mapped.type} remapping at strength ${Number(strength).toFixed(2)}.`;
     const simNote = showSim ? ` Showing as a ${SIM_TYPE_WORDS[mapped.type]} viewer would see both images.` : '';

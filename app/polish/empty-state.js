@@ -27,7 +27,7 @@ export function emptyStateFor(route, profile) {
       return {
         ...common,
         title: 'No colour profile yet',
-        body: 'Without a profile the “after” image will look the same as the original. Take the short test first, or choose a type in Settings.',
+        body: 'The “after” image shows a labelled example correction. Take the short test for your own profile, or choose a type in Settings.',
       };
     case 'settings':
       return {

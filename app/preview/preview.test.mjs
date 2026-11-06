@@ -87,3 +87,25 @@ test('preview re-reads the profile each time its route is shown', () => {
   win.dispatchEvent(new Event('hashchange'));
   assert.equal(refreshes, 2, 'unbinds cleanly');
 });
+
+import { previewCorrection } from './preview.js';
+import { correctImageData } from '../correct/correct.js';
+
+test('no saved profile uses a moderate non-normal example that changes sample pixels', () => {
+  const before = { width: 2, height: 1, data: new Uint8ClampedArray([198, 40, 40, 255, 124, 179, 66, 255]) };
+  for (const profile of [null, undefined, {}, { source: 'default', type: 'normal', severity: 0 }]) {
+    const { example, corrector } = previewCorrection(profile);
+    assert.equal(example, true);
+    assert.deepEqual(corrector, { type: 'deutan', confidence: 0.6 });
+    assert.notDeepEqual(correctImageData(before, corrector).data, before.data);
+  }
+});
+
+test('saved profiles keep their correction, including saved normal profiles', () => {
+  for (const profile of [
+    { source: 'manual', type: 'normal', severity: 0 },
+    { source: 'test', type: 'tritan', severity: 0.8 },
+  ]) {
+    assert.deepEqual(previewCorrection(profile), { example: false, corrector: profileToCorrector(profile) });
+  }
+});

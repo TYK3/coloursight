@@ -170,3 +170,23 @@
   color: var(--colour-text);
   font-size: 0.95rem;
 }
+
+/* Intro-only layout and non-interactive sample. */
+.cs-test__intro .cs-test__lead { margin-bottom: var(--space-2); }
+.cs-test__intro .cs-test__nav { margin-top: var(--space-2); }
+.cs-test__intro .cs-test__primary:focus-visible {
+  outline: 3px solid var(--colour-focus);
+  outline-offset: 3px;
+}
+.cs-test__intro-sample { margin: var(--space-3) 0; }
+.cs-test__intro-sample [role="img"] { display: flex; gap: var(--space-2); }
+.cs-test__intro-sample span {
+  width: 3rem;
+  height: 3rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius);
+  background: #bdada0;
+}
+.cs-test__intro-sample span:nth-child(3) { background: #a7b49c; }
+.cs-test__intro-sample figcaption { color: var(--colour-muted); font-size: 0.95rem; }
+.cs-test__intro .cs-test__disclaimer { margin-top: var(--space-3); }
